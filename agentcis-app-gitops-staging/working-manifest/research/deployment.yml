@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: import-frontend-deployment
+  namespace: agentcis-data-import
+  labels:
+    app: import-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: import-frontend
+  template:
+    metadata:
+      labels:
+        app: import-frontend
+    spec:
+      containers:
+      - name: import-frontend
+        image: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/import-frontend:import-frontend-12-05-ac5954c
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        resources:                          # Optional: Define resource requests/limits to help HPA
+          requests:
+            cpu: "100m"                     # Request 200 milliCPUs
+            memory: "100Mi"
+          limits:
+            cpu: "250m"                     # Limit to 500 milliCPUs
+            memory: "256Mi"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - ip-172-34-28-121
+          - weight: 50
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                -  ip-172-34-28-208
+      tolerations:
+      - key: "node.kubernetes.io/unreachable"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 30
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 30
+

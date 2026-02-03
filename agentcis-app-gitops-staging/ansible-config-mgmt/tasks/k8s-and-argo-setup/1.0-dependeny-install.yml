@@ -1,0 +1,48 @@
+---
+- name: A. Install snap packages
+  community.general.snap:
+    name: "{{ item }}"
+    classic: true
+    state: present
+  loop:
+    - kubectl
+    - helm
+  ignore_errors: no
+
+- name: B. Install system packages
+  ansible.builtin.apt:
+    name:
+      - bash-completion
+      - unzip
+    state: present
+    update_cache: yes
+  become: yes
+
+################## Bash auto completion #####################
+- name: C. Add kubectl bash completion
+  ansible.builtin.lineinfile:
+    path: ~/.bashrc
+    line: 'source <(kubectl completion bash)'
+    state: present
+  register: bashrc_result
+
+- name: D. Reload bashrc
+  ansible.builtin.shell: source ~/.bashrc
+  args:
+    executable: /bin/bash
+  when: bashrc_result.changed
+
+#### aws cli installation ###################
+- name: E. Check if AWS CLI is installed
+  ansible.builtin.command: aws --version
+  register: aws_cli_check_install
+  failed_when: false
+  changed_when: false
+
+- name: F. Install AWS CLI
+  ansible.builtin.shell: |
+    curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+    unzip -q /tmp/awscliv2.zip -d /tmp/
+    sudo /tmp/aws/install
+    rm -rf /tmp/awscliv2.zip /tmp/aws
+  when: aws_cli_check_install.rc != 0

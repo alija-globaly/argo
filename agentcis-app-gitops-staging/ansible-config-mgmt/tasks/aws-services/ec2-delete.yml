@@ -1,0 +1,19 @@
+- name: Terminate EC2 instance by instance ID
+  amazon.aws.ec2_instance:
+    instance_ids:
+      - "{{ instance_id }}"
+    region: "{{ aws_region }}"
+    state: absent
+    wait: true
+  register: ec2_terminated
+  ignore_errors: yes
+
+- name: Show termination status
+  debug:
+    msg: "Instance {{ instance_id }} terminated"
+  when: ec2_terminated is succeeded
+
+- name: Wait for instance to be fully terminated
+  pause:
+    seconds: 5
+  when: ec2_terminated is succeeded

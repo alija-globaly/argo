@@ -1,0 +1,8 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: metallb-loadbalancer-ck-loadbalancer
+  namespace: metallb-system
+spec:
+  addresses:
+  - 172.34.27.0-172.34.27.127

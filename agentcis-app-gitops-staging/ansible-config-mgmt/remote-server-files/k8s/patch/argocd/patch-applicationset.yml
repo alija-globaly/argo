@@ -1,0 +1,12 @@
+spec:
+  template:
+    spec:
+      containers:
+      - name: argocd-applicationset-controller
+        resources:
+          limits:
+            cpu: "2"
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi

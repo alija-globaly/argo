@@ -1,0 +1,22 @@
+{{- if .Values.gateway.https_mode.enabled }}
+---
+apiVersion: gateway.k8s.aws/v1beta1
+kind: LoadBalancerConfiguration
+metadata:
+  name: {{ .Values.gateway.https_mode.aws_alb_config.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  scheme: {{ .Values.gateway.https_mode.aws_alb_config.scheme }}
+  ipAddressType: {{ .Values.gateway.https_mode.aws_alb_config.ipAddressType }}
+  listenerConfigurations:
+    - protocolPort: HTTP:80
+      protocolPort: HTTPS:443
+      defaultCertificate: {{ .Values.gateway.https_mode.aws_alb_config.defaultCertificate | quote }}
+{{- end }}
+
+
+
+
+
+
+

@@ -1,0 +1,11 @@
+- hosts: staging_k8s_master
+  remote_user: ubuntu
+  connection: ssh
+  gather_facts: false
+  vars_files:
+    - "{{ playbook_dir }}/variables/color-code.yml"
+    - "{{ playbook_dir }}/variables/k8s-variable.yml"
+  vars:
+    timestamp: "{{ lookup('pipe', 'date +%Y-%m-%d_%H-%M') }}"
+  tasks:
+    - import_tasks: "{{ playbook_dir }}/tasks/0-connection-test.yml"

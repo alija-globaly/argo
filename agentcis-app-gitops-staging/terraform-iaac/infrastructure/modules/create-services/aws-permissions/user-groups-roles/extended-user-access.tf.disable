@@ -1,0 +1,83 @@
+resource "aws_iam_policy" "user_self_management" {
+  name        = "own-access-keys-${var.project_name}-${var.environment}-policy"
+  path        = "/"
+  description = "Policy for user self-service including MFA, password, and access key management"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "GlobalIAMPermissions"
+        Effect = "Allow"
+        Action = [
+          "iam:ListPolicies",
+          "iam:GetAccountPasswordPolicy",
+          "iam:GetMFADevice",
+          "iam:ListCloudFrontPublicKeys",
+          "iam:ListRoles",
+          "iam:ListMFADevices",
+          "iam:ListVirtualMFADevices",
+          "iam:UpdateAccountPasswordPolicy",
+          "iam:ListAccountAliases",
+          "iam:ListUsers",
+          "iam:ListGroups",
+          "iam:ListMFADeviceTags",
+          "iam:ListUserTags",
+          "iam:ListAccessKeys"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "UserSelfServicePermissions"
+        Effect = "Allow"
+        Action = [
+          "iam:DeactivateMFADevice",
+          "iam:ListPoliciesGrantingServiceAccess",
+          "iam:TagMFADevice",
+          "iam:CreateVirtualMFADevice",
+          "iam:ListUserPolicies",
+          "iam:ListMFADevices",
+          "iam:ListPolicyVersions",
+          "iam:GetUserPolicy",
+          "iam:DeleteVirtualMFADevice",
+          "iam:ListGroupsForUser",
+          "iam:ListAttachedRolePolicies",
+          "iam:EnableMFADevice",
+          "iam:ResyncMFADevice",
+          "iam:UntagMFADevice",
+          "iam:ListAttachedUserPolicies",
+          "iam:ListAttachedGroupPolicies",
+          "iam:ListPolicyTags",
+          "iam:GetUser",
+          "iam:ListMFADeviceTags",
+          "iam:GetLoginProfile",
+          "iam:ChangePassword",
+          "iam:ListUserTags",
+          "iam:ListAccessKeys",
+          "iam:DeleteAccessKey",
+          "iam:GetAccessKeyLastUsed",
+          "iam:UpdateAccessKey",
+          "iam:CreateAccessKey"
+        ]
+        Resource = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/$${aws:username}"
+      },
+      {
+        Sid    = "DenyListOtherUsersAccessKeys"
+        Effect = "Deny"
+        Action = [
+          "iam:ListAccessKeys",
+          "iam:GetUser",
+          "iam:ListUsers"
+        ]
+        Resource = "arn:aws:iam::*:user/*"
+        Condition = {
+          StringNotLike = {
+            "aws:username" = "$${aws:username}"
+          }
+        }
+      }
+    ]
+  })
+}
+
+data "aws_caller_identity" "current" {}

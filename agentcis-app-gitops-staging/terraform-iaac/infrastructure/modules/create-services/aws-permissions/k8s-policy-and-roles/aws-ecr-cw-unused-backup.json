@@ -1,0 +1,64 @@
+{
+    "Statement": [
+        {
+            "Action": [
+                "ecr:*"
+            ],
+            "Effect": "Allow",
+            "Resource": "*",
+            "Sid": "ECRPrivateFullAccess"
+        },
+        {
+            "Action": [
+                "ecr-public:*"
+            ],
+            "Effect": "Allow",
+            "Resource": "*",
+            "Sid": "ECRPublicFullAccess"
+        },
+        {
+            "Action": [
+                "sts:GetServiceBearerToken"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "sts:AWSServiceName": "ecr-public.amazonaws.com"
+                }
+            },
+            "Effect": "Allow",
+            "Resource": "*",
+            "Sid": "STSForECRPublic"
+        },
+        {
+            "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:PutSecretValue",
+                "secretsmanager:CreateSecret",
+                "secretsmanager:DeleteSecret",
+                "secretsmanager:CancelRotateSecret",
+                "secretsmanager:ListSecretVersionIds",
+                "secretsmanager:UpdateSecret",
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:GetRandomPassword",
+                "secretsmanager:ListSecrets",
+                "secretsmanager:TagResource",
+                "secretsmanager:UntagResource"
+            ],
+            "Effect": "Allow",
+            "Resource": "*",
+            "Sid": "SecretsManagerReadWrite"
+        },
+        {
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:CreateLogGroup",
+                "logs:PutLogEvents"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:logs:*:*:log-group:/aws/imagebuilder/*",
+            "Sid": "CloudWatchLogsForImageBuilder"
+        }
+    ],
+    "Version": "2012-10-17"
+}

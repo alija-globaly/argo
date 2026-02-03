@@ -1,0 +1,78 @@
+---
+# shyam Deployment (shyam namespace) - FIXED SELECTOR
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shyam
+  namespace: shyam
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: shyam
+  template:
+    metadata:
+      labels:
+        app: shyam
+    spec:
+      containers:
+      - name: shyam
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+---
+# shyam Service (shyam namespace)
+apiVersion: v1
+kind: Service
+metadata:
+  name: shyam
+  namespace: shyam
+  labels:
+    app: shyam
+spec:
+  type: NodePort
+  ports:
+    - name: gateway-port
+      port: 29000
+      targetPort: 80
+  selector:
+    app: shyam
+---
+# subash Deployment (subash namespace)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subash
+  namespace: subash
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: subash-web
+  template:
+    metadata:
+      labels:
+        app: subash-web
+    spec:
+      containers:
+      - name: subash-web
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+---
+# subash-web Service (subash namespace)
+apiVersion: v1
+kind: Service
+metadata:
+  name: subash-web
+  namespace: subash
+  labels:
+    app: subash-web
+spec:
+  type: NodePort
+  ports:
+    - name: gateway-port
+      port: 29000
+      targetPort: 80
+  selector:
+    app: subash-web

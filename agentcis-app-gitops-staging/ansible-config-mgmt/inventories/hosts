@@ -1,0 +1,3 @@
+[staging_k8s_master]
+3.26.227.122 ansible_user=ubuntu
+

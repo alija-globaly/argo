@@ -1,0 +1,72 @@
+frontend:
+  name: agentcis-frontend
+  replicaCount: 1
+
+  image:
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/agent-portal-frontend
+    tag: "agent-portal-frontend-12-18-e84c26a"
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets:
+    enabled: true
+    name: ecr-registry-secret
+
+  startupCommand:
+    enabled: true
+    shell: /bin/sh
+    command: |
+      echo "-------------------------------"
+      echo "k8s => restarting nginx"
+      echo "-------------------------------"
+      echo "k8s => starting NODE frontend"
+      echo "-------------------------------"
+      tail -f /dev/null
+  resources:
+    requests:
+      memory: "200Mi"
+    limits:
+      memory: "300Mi"
+
+  volumes:
+    enabled: false
+    env:
+      enabled: true
+      pvcName: nfs-email-summary-config-pvc
+      mountPath: /prod/packages/email-summary-service/.env
+      subPath: frontend.env
+    logs:
+      enabled: true
+      pvcName: nfs-email-summary-log-pvc
+      mountPath: /prod/packages/email-summary-service/logs
+      subPath: email-summary-frontend-log
+
+  affinity:
+    enabled: false
+    preferredNodes:
+      - hostname: agentcis-staging-k8s-master-172-34-28-189
+        weight: 100
+      - hostname: other-server
+        weight: 50
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 9000
+
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    cpuUtilization: 50
+    scaleUp:
+      podsValue: 2
+    scaleDown:
+      podsValue: 1
+
+  ingress:
+    enabled: true
+    clusterIssuer: lets-encrypt
+    className: nginx
+    host: subash.globalyhub.com
+    className: nginx
+    path: /

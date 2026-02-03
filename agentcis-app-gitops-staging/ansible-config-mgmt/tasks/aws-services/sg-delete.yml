@@ -1,0 +1,13 @@
+- name: Delete security group by ID
+  amazon.aws.ec2_security_group:
+    group_id: "{{ security_group_id }}"
+    region: "{{ aws_region }}"
+    state: absent
+  register: sg_deleted
+  ignore_errors: yes
+
+- name: Show security group deletion status
+  debug:
+    msg: "Security group {{ security_group_id }} deleted"
+  when: sg_deleted is succeeded
+

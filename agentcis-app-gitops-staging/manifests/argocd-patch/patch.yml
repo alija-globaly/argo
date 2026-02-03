@@ -1,0 +1,49 @@
+      resources:
+        limits:
+          cpu: "1"
+          memory: 2000Mi
+        requests:
+          cpu: 500m
+          memory: 1000Mi
+
+########### REPO SERVER
+      resources:
+        limits:
+          cpu: "1"
+          memory: 512Mi
+        requests:
+          cpu: 250m
+          memory: 256Mi
+
+########### APPLICATION
+      resources:
+        limits:
+          cpu: "2"
+          memory: 1Gi
+        requests:
+          cpu: 250m
+          memory: 512Mi
+########### CONTROLLER
+      resources:
+        limits:
+          cpu: "1"
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 1Gi
+########### SERVER
+      resources:
+        limits:
+          cpu: "500m"
+          memory: 256Mi
+        requests:
+          cpu: 125m
+          memory: 128Mi
+########### REDIS
+      resources:
+        limits:
+          cpu: "500m"
+          memory: 256Mi
+        requests:
+          cpu: 250m
+          memory: 128Mi

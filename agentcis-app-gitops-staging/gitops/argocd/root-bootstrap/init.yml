@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: 0-init-pre-setup
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  project: default  
+  # Use "sources" (plural) instead of "source"
+  sources:
+  - repoURL: "https://github.com/GlobalyHub/agentcis-app-gitops.git"
+    path: "gitops/argocd/initial-dependency/init-application"
+    targetRevision: "staging"
+    directory:
+      recurse: true      
+  - repoURL: "https://github.com/GlobalyHub/agentcis-app-gitops.git"
+    path: "gitops/argocd/initial-dependency/projects"
+    targetRevision: "staging"  
+  - repoURL: "https://github.com/GlobalyHub/agentcis-app-gitops.git"
+    path: "gitops/argocd/initial-dependency/universal-manifest"
+    targetRevision: "staging"
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: false
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+      - PruneLast=true 
+      - PrunePropagationPolicy=foreground       

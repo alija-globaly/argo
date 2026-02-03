@@ -1,0 +1,9 @@
+- name: Show deletion summary
+  debug:
+    msg:
+      - "===================================="
+      - "Resource Deletion Complete"
+      - "===================================="
+      - "Instance: {{ instance_id }}"
+      - "Security Group: {{ security_group_id }}"
+      - "===================================="

@@ -1,0 +1,145 @@
+frontend:
+  name: agentcis-frontend
+  replicaCount: 1
+
+  image:
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/import-frontend
+    tag: import-frontend-01-19-596de9b
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets:
+    enabled: true
+    name: ecr-registry-secret
+
+  startupCommand:
+    enabled: false
+    shell: /bin/sh
+    command: |
+      echo "-------------------------------"
+      echo "k8s => restarting nginx"
+      echo "-------------------------------"
+      service nginx start
+      echo "k8s => restarting nginx"
+      echo "-------------------------------"
+      echo "k8s => starting NODE frontend"
+      echo "-------------------------------"
+      node .output/server/index.mjs
+
+  resources:
+    requests:
+      memory: "500Mi"
+    limits:
+      memory: "1000Mi"
+
+
+  pv:
+    config:
+      name: nfs-pv-data-import-config
+      capacity: 5Gi
+      nfsPath: /agentcis-manifest/data-import/config
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
+    log:
+      name: nfs-pv-data-import-log
+      capacity: 5Gi
+      nfsPath: /agentcis-pvc/helm-test
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
+
+  pvc:
+    config:
+      name: nfs-config-pvc
+    log:
+      name: nfs-data-import-pvc
+  
+
+  volumes:
+    enabled: true
+    env:
+      enabled: true
+      pvcName: nfs-config-pvc
+      mountPath: /prod/packages/email-summary-service/.env
+      subPath: frontend.env
+    logs:
+      enabled: true
+      pvcName: nfs-data-import-pvc
+      mountPath: /prod/packages/email-summary-service/logs
+      subPath: email-summary-frontend-log
+
+  affinity:
+    enabled: false
+    preferredNodes:
+      - hostname: agentcis-staging-k8s-master-172-34-28-189
+        weight: 100
+      - hostname: other-server
+        weight: 50
+
+  # probe configurations
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 30
+  
+  startupProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 10
+    
+    
+  service:
+    enabled: true
+    port: 80
+    portName: nginx-http
+    # type: ClusterIP
+    targetPort: 80
+    type: NodePort    
+
+  hpa:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    cpuUtilization: 50
+    scaleUp:
+      podsValue: 2
+    scaleDown:
+      podsValue: 1
+  ingress:
+    enabled: false
+    clusterIssuer: lets-encrypt-production
+    tlsEnabled: false
+    host: staging.agentcis.com
+    path: /
+
+  httproute:
+    enabled: false
+    path: "/agent-portal"
+    gateway:
+      name: "agentcisapp-stage-alb-gateway"
+      namespace: "agentcisapp-gateway"
+      sectionName: "https"
+
+
+  targetGroupConfiguration:
+    enabled: false
+    targetType: "instance"
+    healthCheckPath: "/nginx-health"
+    healthCheckProtocol: "HTTP"
+    healthCheckInterval: 5
+    healthCheckTimeout: 4      # ← ADD THIS LINE
+    healthyThresholdCount: 2
+    unhealthyThresholdCount: 2
+    matcher:
+      httpCode: "200-399,401-404"

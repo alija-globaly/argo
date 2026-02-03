@@ -1,0 +1,21 @@
+---
+- name: A. Copying K8s Setup script
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/remote-server-files/scripts/canonical-k8s-root-node-setup.sh"
+    dest: "/tmp/canonical-k8s-root-node-setup.sh"
+    mode: '0755'
+
+- name: B. Initializing K8s setup
+  ansible.builtin.shell: /tmp/canonical-k8s-root-node-setup.sh
+  args:
+    executable: /bin/bash
+  register: k8s_setup_output
+
+- name: C. Display output
+  ansible.builtin.debug:
+    var: k8s_setup_output.stdout_lines
+
+- name: D. Removing script from remote system
+  ansible.builtin.file:
+    path: /tmp/canonical-k8s-root-node-setup.sh
+    state: absent

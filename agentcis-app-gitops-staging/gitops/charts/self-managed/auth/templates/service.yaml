@@ -1,0 +1,39 @@
+{{- if .Values.auth.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.auth.name }}-svc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.auth.name }}-service
+    {{- with .Values.auth.service.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.auth.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: {{ .Values.auth.name }}
+  type: {{ .Values.auth.service.type }}
+  ports:
+    - name: {{ .Values.auth.service.portNameOne }}
+      port: {{ .Values.auth.service.portOne }}
+      targetPort: {{ .Values.auth.service.targetPortOne }}
+      {{- if eq .Values.auth.service.type "NodePort" }}
+      nodePort: {{ .Values.auth.service.nodePortOne }}
+      {{- end }}
+
+    - name: {{ .Values.auth.service.portNameTwo }}
+      port: {{ .Values.auth.service.portTwo }}
+      targetPort: {{ .Values.auth.service.targetPortTwo }}
+      {{- if eq .Values.auth.service.type "NodePort" }}
+      nodePort: {{ .Values.auth.service.nodePortTwo }}
+      {{- end }}
+
+      protocol: TCP
+  ipFamilyPolicy: SingleStack
+  ipFamilies: 
+    - IPv4
+{{- end }}

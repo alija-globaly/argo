@@ -1,0 +1,15 @@
+- hosts: localhost
+  remote_user: ubuntu
+  connection: local
+  gather_facts: false
+  vars_files:
+    - "../variables/color-code.yml"
+    - "../variables/k8s-variable.yml"    
+    - "../variables/aws-delete-variable.yml"    
+  vars:
+    timestamp: "{{ lookup('pipe', 'date +%Y-%m-%d_%H-%M') }}"
+  tasks:
+    - import_tasks: "../tasks/aws-services/ec2-delete.yml"  
+    - import_tasks: "../tasks/aws-services/sg-delete.yml" 
+    - import_tasks: "../tasks/aws-services/deletion-summary.yml" 
+     

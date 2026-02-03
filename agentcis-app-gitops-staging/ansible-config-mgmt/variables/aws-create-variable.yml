@@ -1,0 +1,69 @@
+# vpc
+aws_region: ap-southeast-2
+vpc_id: vpc-26227943
+subnet_id: subnet-91300ce6
+
+# Instance Settings
+instance_name: subash-ansible-machine
+instance_type: t3.medium
+# fresh ubuntu image
+ami_id: ami-0b8d527345fdace59
+# worker custom AMI
+#ami_id: ami-081fc13fa16857370
+
+key_name: agentcis-v3-stagging
+### manual profile
+#iam_instance_profile: arn:aws:iam::834033184010:instance-profile/subash-eks-ec2-irsa-sample
+
+### terraform created profile
+iam_instance_profile: arn:aws:iam::834033184010:instance-profile/Agentcis-staging-AWSLoadBalancerController-profile
+
+# Security Group
+security_group_name: Ansible-kubernetes-security-group
+
+# Storage Settings
+volume_size: 30
+volume_type: gp3  # Options: gp2, gp3, io1, io2, st1, sc1
+
+user_data: |
+  #!/bin/bash
+  mkdir -p /home/ubuntu/.ssh
+  SSH_AUTHORIZED_FILE="/home/ubuntu/.ssh/authorized_keys"
+  
+  # Key 1 - subash main public key
+  KEY1="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCui/GZdXROyaoPCKf2DT6mWwvv6KEtl9K3k9FmmXmxjOV4hyVLG7tfoG0vvz9eyng5+emGTiZ3FCZS8MXx2S64BCAqVBGEdqNvwq4/RMeGq8+4WiEUEPrVpW52vTr3acKNuTw0hL+eYPM1vK/OmNXuqsbtZPkoPmuodkRhYFsUZlPl6dZM4QvpV0Vwv4OrdHddsG/u0HaVEZr+p6AeGrZ2mPlPUQv2Sxd1RdKAfAV4X8J2uVKp/5Lv94bATlqsc9l8J5U9ig/5Jnr2noMv5KoI5pE57Gpq/A35CscAdassuWrjGXsHBARbGomNKxxwdR9KvTJBnr39SRbjB/a/xnfR DELL@DESKTOP-N70J5HB"
+  
+  # Key 2 - subash vm key
+  KEY2="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCs8iJCk5e5N9Uhpo1h0Aj6jd4uDW1Dnl8Ab4zXGGS3ZCp/h7iU5iUeKioydUBfh3BmFgS2Rq1ytirGvdbn4bhW4PFTGYFTok63w726lI6BEjq2OLTQHK0jfjpUqKbOEEUUDJ8yvxuTjf/crptkzg4Zt7XKunSrMLEGGoEE2ot6ElRP3s1Wpy5xRHAjGI9jGr/to2GdLExVUrNSDLFxHuEwh0mg/icVy8ofGQ0H+nQC8ll22uAFjx+zFtan3cL/jh5vgXt91XZq2TOiDYCRajQBql1np7PkjzbRVUOqrFbZOrOrSzmagTenNw+LrBGJMwF0XEHV0729GddFHR35ak+r subash@local-server"
+  
+  # Add key1 if not present
+  if ! grep -qF "$KEY1" "$SSH_AUTHORIZED_FILE"; then
+    echo "$KEY1" >> "$SSH_AUTHORIZED_FILE"
+    echo "Added subashvm@server key"
+  else
+    echo "subashvmw@server key already exists"
+  fi
+  
+  # Add key2 if not present
+  if ! grep -qF "$KEY2" "$SSH_AUTHORIZED_FILE"; then
+    echo "$KEY2" >> "$SSH_AUTHORIZED_FILE"
+    echo "Added subash@server key"
+  else
+    echo "subash@server key already exists"
+  fi
+  #chmod 600 /home/ubuntu/.ssh/authorized_keys
+
+# User Data (startup script)
+worker_user_data: |
+  #!/bin/bash
+  sleep 45
+  #systemctl is-system-running --wait
+  sudo -u ubuntu bash -c '
+    set -e
+    curl -fsSL \
+      https://globalyhub-kubernetes-aws-provider.s3.ap-southeast-2.amazonaws.com/scripts/k8s-worker-node-setup.sh | \
+      bash -s -- --worker subash-server-worker
+  '
+  # curl -L --progress-bar \
+  #   https://globalyhub-kubernetes-aws-provider.s3.ap-southeast-2.amazonaws.com/scripts/k8s-worker-node-setup.sh | \
+  #   bash -s -- --worker subash-server-worker

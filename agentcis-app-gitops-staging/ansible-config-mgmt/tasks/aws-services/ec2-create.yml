@@ -1,0 +1,34 @@
+- name: Launch EC2 instance
+  amazon.aws.ec2_instance:
+    name: "{{ instance_name }}"
+    region: "{{ aws_region }}"
+    key_name: "{{ key_name }}"
+    vpc_subnet_id: "{{ subnet_id }}"
+    instance_type: "{{ instance_type }}"
+    security_group: "{{ security_group_name }}"
+    image_id: "{{ ami_id }}"
+    user_data: "{{ user_data }}"
+    iam_instance_profile: "{{ iam_instance_profile }}"
+    volumes:
+      - device_name: /dev/sda1  # Will appear as /dev/nvme0n1 on the instance
+        ebs:
+          volume_size: "{{ volume_size }}"
+          volume_type: "{{ volume_type }}"
+          delete_on_termination: true
+    network_interfaces:
+      - assign_public_ip: true
+    tags:
+      Name: "{{ instance_name }}"
+    wait: true
+    state: present
+  register: ec2
+
+- name: Show instance ID
+  debug:
+    msg: "Instance created: {{ ec2.instance_ids[0] }}"
+
+# - name: Attach IAM role to existing instance
+#   amazon.aws.ec2_instance:
+#     instance_ids: "{{ ec2.instance_ids }}"
+#     iam_instance_profile: "{{ iam_instance_profile }}"
+#     state: present

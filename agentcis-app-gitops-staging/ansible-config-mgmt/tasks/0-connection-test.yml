@@ -1,0 +1,18 @@
+---
+- name: Basic Connection Test
+  ansible.builtin.shell: "{{ item }}"
+  loop:
+    - printf "{{ blue_color }}Checking connection to remote host{{ color_reset }}\n"
+    - curl -s ifconfig.me
+    - printf "{{ blue_color }}Remote username: $(whoami){{ color_reset }}\n"
+    - printf "{{ blue_color }}Remote hostname: $(hostname){{ color_reset }}\n"
+    - printf "{{ blue_color }}Connection test completed successfully{{ color_reset }}\n"
+  register: host_run_output
+
+# Task 2: Display loop task results
+- name: Task2 => Display connection test results
+  ansible.builtin.debug:
+    msg: "{{ item.stdout | default('') }}"
+  loop: "{{ host_run_output.results }}"
+  loop_control:
+    label: "{{ item.item }}"

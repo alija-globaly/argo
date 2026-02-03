@@ -1,0 +1,21 @@
+- name: Check and install argocd-autopilot
+  ansible.builtin.shell: |
+    if command -v argocd-autopilot >/dev/null 2>&1; then
+        printf "{{ blue_color }} argocd-autopilot is already installed {{ color_reset }}\n"
+        argocd-autopilot version
+    else
+        printf "{{ blue_color }} Installing argocd-autopilot {{ color_reset }}\n"
+        curl -L --output - https://github.com/argoproj-labs/argocd-autopilot/releases/download/v0.4.20/argocd-autopilot-linux-amd64.tar.gz | tar zx -C /tmp
+        mv /tmp/argocd-autopilot-* /usr/local/bin/argocd-autopilot
+        chmod +x /usr/local/bin/argocd-autopilot
+        printf "{{ blue_color }} argocd-autopilot installed successfully {{ color_reset }}\n"
+        argocd-autopilot version
+    fi
+  args:
+    executable: /bin/bash
+  become: yes
+  register: autopilot_output
+
+- name: Display argocd-autopilot output
+  ansible.builtin.debug:
+    msg: "{{ autopilot_output.stdout_lines }}"

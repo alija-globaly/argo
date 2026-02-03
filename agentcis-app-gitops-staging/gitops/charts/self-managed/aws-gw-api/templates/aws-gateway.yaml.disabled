@@ -1,0 +1,28 @@
+{{- if .Values.gateway.https_mode.enabled }}
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: {{ .Values.gateway.https_mode.k8s_api_gateway.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  gatewayClassName: {{ .Values.gateway.https_mode.k8s_api_gateway.gatewayClassName }}
+  infrastructure:
+    parametersRef:
+      group: gateway.k8s.aws
+      kind: LoadBalancerConfiguration
+      name: {{ .Values.gateway.https_mode.aws_alb_config.name }}
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: {{ .Values.gateway.https_mode.k8s_api_gateway.listener_http_namespaces }}
+    - name: https
+      protocol: HTTPS
+      port: 443
+      allowedRoutes:
+        namespaces:
+          from: {{ .Values.gateway.https_mode.k8s_api_gateway.listener_http_namespaces }}
+{{- end }}

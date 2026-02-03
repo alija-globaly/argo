@@ -1,0 +1,135 @@
+auth:
+  name: agentcis-auth
+  replicaCount: 1
+
+  image:
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/data-import-auth
+    tag: import-auth-01-19-596de9b
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets:
+    enabled: true
+    name: ecr-registry-secret
+
+  startupCommand:
+    enabled: false
+    shell: /bin/sh
+    command: |
+      echo "-------------------------------"
+      echo "k8s => restarting nginx"
+      service nginx restart 
+      echo "-------------------------------"
+      echo "k8s => starting data-import consumer"
+      echo "-------------------------------"
+      pnpm start:import-consumer | tee -a /prod/packages/auth/logs/authentication-server.log
+  
+
+  resources:
+    requests:
+      memory: "500Mi"
+    limits:
+      memory: "1000Mi"
+
+  volumes:
+    enabled: true
+    env:
+      enabled: true
+      pvcName: nfs-config-pvc
+      mountPath: /prod/packages/auth/.env
+      subPath: auth.env
+    logs:
+      enabled: true
+      pvcName: nfs-data-import-pvc
+      mountPath: /prod/packages/auth/logs/
+      subPath: email-summary-auth-log
+
+  affinity:
+    enabled: false
+    preferredNodes:
+      - hostname: agentcis-staging-k8s-master-172-34-28-189
+        weight: 100
+      - hostname: other-server
+        weight: 50
+
+  # probe configurations
+  livenessProbe:
+    httpGet:
+      path: /health-check
+      port: 3002
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /health-check
+      port: 3002
+    initialDelaySeconds: 30
+    periodSeconds: 30
+  
+  startupProbe:
+    httpGet:
+      path: /health-check
+      port: 3002
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+
+    
+  # service:
+  #   enabled: true
+  #   port: 80
+  #   portName: auth-service
+  #   # type: ClusterIP
+  #   targetPort: 80
+  #   type: NodePort    
+
+  service:
+    enabled: true
+    type: NodePort  
+    portNameOne: auth-service
+    portOne: 3010
+    targetPortOne: 3010
+    nodePortOne: 3010
+    portNameTwo: auth-grpc
+    portTwo: 50051
+    targetPortTwo: 50051
+    nodePortTwo: 50051
+
+
+  hpa:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    cpuUtilization: 50
+    scaleUp:
+      podsValue: 2
+    scaleDown:
+      podsValue: 1
+  ingress:
+    enabled: false
+    clusterIssuer: lets-encrypt-production
+    tlsEnabled: false
+    host: staging.agentcis.com
+    path: /
+
+  httproute:
+    enabled: false
+    path: "/agent-portal"
+    gateway:
+      name: "agentcisapp-stage-alb-gateway"
+      namespace: "agentcisapp-gateway"
+      sectionName: "https"
+
+
+  targetGroupConfiguration:
+    enabled: false
+    targetType: "instance"
+    healthCheckPath: "/nginx-health"
+    healthCheckProtocol: "HTTP"
+    healthCheckInterval: 5
+    healthCheckTimeout: 4      # ← ADD THIS LINE
+    healthyThresholdCount: 2
+    unhealthyThresholdCount: 2
+    matcher:
+      httpCode: "200-399,401-404"

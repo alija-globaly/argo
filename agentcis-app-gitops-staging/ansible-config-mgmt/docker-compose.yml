@@ -1,0 +1,15 @@
+services:
+  ansible:
+    image: cytopia/ansible:2.13-tools
+    platform: ${PLATFORM:-linux/amd64}
+    container_name: ansible_runner
+    working_dir: /ansible
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env    
+    volumes:
+      - ./:/ansible:ro
+      - ./.ssh-keys/:/root/.ssh
+
+      

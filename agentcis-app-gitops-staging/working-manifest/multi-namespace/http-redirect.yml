@@ -1,0 +1,20 @@
+---
+# HTTPRoute - Redirect ALL HTTP (port 80) to HTTPS
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: http-to-https-redirect
+  namespace: shyam
+spec:
+  parentRefs:
+    - name: agentcis-stage-alb-gateway
+      kind: Gateway
+      namespace: research
+      sectionName: http  # Target HTTP listener (port 80)
+  rules:
+    - filters:  # Redirect ALL traffic on port 80
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301  # Permanent redirect
+      backendRefs: []  # No backend - pure redirect

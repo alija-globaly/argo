@@ -1,0 +1,10 @@
+# Ignore everything inside .ssh-keys
+.ssh-keys/*
+
+.env
+
+# But keep the directory
+!.ssh-keys/
+
+# Allow .gitkeep only 
+!.ssh-keys/.gitkeep

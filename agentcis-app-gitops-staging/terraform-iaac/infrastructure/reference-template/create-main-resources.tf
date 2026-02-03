@@ -1,0 +1,20 @@
+############# Network infrastructure create ################
+module "create_vpc" {
+  source      = "../modules/create-services/vpc"
+  vpc_name    = "${var.project_name}-${var.vpc_name}-${var.environment}-VPC"
+  cidr_block  = var.cidr_block
+  environment = var.environment
+}
+
+module "create_subnets" {
+  source = "../modules/create-services/subnets"
+  #####  for imported ###################
+  # vpc_id                     = module.import_vpc.vpc-id
+  # igw-id                     = module.import_vpc.igw-id  
+  ########### for created  #############
+  vpc_id                     = module.create_vpc.vpc-id
+  igw-id                     = module.create_vpc.igw-id
+  public_subnet_cidr_blocks  = var.public_subnet_cidr_blocks
+  private_subnet_cidr_blocks = var.private_subnet_cidr_blocks
+  subnet_availability_zones  = var.subnet_availability_zones
+}

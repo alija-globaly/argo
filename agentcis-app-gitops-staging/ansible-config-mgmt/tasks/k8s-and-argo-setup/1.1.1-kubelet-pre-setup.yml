@@ -1,0 +1,58 @@
+---
+- name: ECR Credential Provider Setup
+  block:
+    - name: 1.1.1 aws cloud provider config and binary setup
+      ansible.builtin.shell: |
+        printf "{{ blue_color }}ECR Credential Provider setup{{ color_reset }}\n"
+      args:
+        executable: /bin/bash
+
+    - name: A. Create credential provider directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ k8s_kubelet_config_dir }}"
+        - "{{ k8s_kubelet_binary_dir }}"
+
+    - name: B. Checking k8s aws-cloud-provider binary exists or not
+      ansible.builtin.stat:
+        path: "{{ k8s_kubelet_binary_dir }}/ecr-credential-provider"
+      register: k8s_aws_provider_binary
+
+    - name: C. Downloading binary if missing
+      ansible.builtin.shell: |
+        curl -sSL "{{ k8s_kubelet_aws_cred_binary_url }}" -o "{{ k8s_kubelet_binary_dir }}/ecr-credential-provider"
+        chmod +x "{{ k8s_kubelet_binary_dir }}/ecr-credential-provider"
+      args:
+        executable: /bin/bash
+      when: not k8s_aws_provider_binary.stat.exists
+
+    - name: D. Check if config file exists
+      ansible.builtin.stat:
+        path: "{{ k8s_kubelet_config_dir }}/config.yaml"
+      register: config_file
+
+    - name: E. Copy k8s kubelet ecr config file if missing
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/remote-server-files/k8s/configs/credential-provider-aws-config.yaml"
+        dest: "{{ k8s_kubelet_config_dir }}/config.yaml"
+        mode: '0644'
+      when: not config_file.stat.exists
+
+    - name: F. Get version
+      ansible.builtin.shell: "{{ k8s_kubelet_binary_dir }}/ecr-credential-provider --version"
+      register: version
+      changed_when: false
+      failed_when: false
+
+    - name: G. Print version
+      ansible.builtin.shell: |
+        printf "{{ green_color }}Version: {{ version.stdout }}{{ color_reset }}\n"
+        printf "{{ blue_color }}Setup completed{{ color_reset }}\n"
+      args:
+        executable: /bin/bash
+      when: version.rc == 0
+
+  become: yes      

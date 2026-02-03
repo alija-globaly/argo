@@ -1,0 +1,28 @@
+{{- if .Values.backend.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.backend.name }}-svc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.backend.name }}-service
+    {{- with .Values.backend.service.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.backend.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: {{ .Values.backend.name }}
+  type: {{ .Values.backend.service.type }}
+  ports:
+    - name: {{ .Values.backend.name }}-port
+      port: {{ .Values.backend.service.port }}
+      targetPort: {{ .Values.backend.service.port }}
+      protocol: TCP
+  ipFamilyPolicy: SingleStack
+  ipFamilies: 
+    - IPv4
+{{- end }}

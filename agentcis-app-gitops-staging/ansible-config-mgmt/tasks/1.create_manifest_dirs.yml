@@ -1,0 +1,16 @@
+- name: Ensure base directory exists
+  ansible.builtin.file:
+    path: "{{ base_dir }}"
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: "0775"
+
+- name: Create subdirectories inside manifest
+  ansible.builtin.file:
+    path: "{{ base_dir }}/{{ item }}"
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: "0775"
+  loop: "{{ manifest_dirs }}"

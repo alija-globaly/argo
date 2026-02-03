@@ -1,0 +1,47 @@
+
+# Optional: Resource limits
+clusterName: agentcis-staging
+region: ap-southeast-2
+
+vpcId: vpc-26227943
+serviceAccount:
+  create: true
+  name: aws-load-balancer-controller
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::834033184010:role/Agentcis-staging-K8s-EC2-IRSA-role"
+
+hostNetwork: true
+replicaCount: 1
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 500Mi
+  requests:
+    cpu: 100m
+    memory: 200Mi
+
+# Optional: Enable additional features
+enableShield: false
+enableWaf: false
+enableWafv2: false
+
+# === Gateway API ===
+controllerConfig:
+  featureGates:
+    ALBGatewayAPI: true
+    NLBGatewayAPI: true
+
+######### using affinity to deploy to node which have ec2 master
+#### command to tag label
+#### kubectl label node aws-elb--master-172-34-17-55 role=aws-elb-master
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+            - key: role
+              operator: In
+              values:
+                - aws-elb-master

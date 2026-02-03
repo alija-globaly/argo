@@ -1,0 +1,26 @@
+- name: Ensure ArgoCD namespace exists
+  ansible.builtin.shell: |
+    if ! kubectl get namespace argocd >/dev/null 2>&1; then
+        printf "{{ red_color }} Creating ArgoCD namespace {{ color_reset }}\n"
+        kubectl create namespace argocd
+    else
+        printf "{{ green_color }} ArgoCD namespace already exists. Skipping creation. {{ color_reset }}\n"
+    fi
+  args:
+    executable: /bin/bash
+    chdir: /home/ubuntu/
+
+- name: Check and install ArgoCD
+  ansible.builtin.shell: |
+    if kubectl get deployment argocd-server -n argocd >/dev/null 2>&1; then
+        printf "{{ green_color }} ArgoCD is already installed. Skipping installation. {{ color_reset }}\n"
+    else
+        printf "{{ red_color }} Argocd Manifest download and Installation {{ color_reset }}\n"
+        mkdir -p {{ argocd_manifest_dir }}
+        wget {{ argocd_manifest_url }} -O {{ argocd_manifest_dir }}/argocd-install.yml
+        kubectl apply -n argocd -f {{ argocd_manifest_dir }}/argocd-install.yml
+        printf "{{ blue_color }} Argocd Setup is started and will be up soon ..... {{ color_reset }}\n"
+    fi
+  args:
+    executable: /bin/bash
+    chdir: /home/ubuntu/

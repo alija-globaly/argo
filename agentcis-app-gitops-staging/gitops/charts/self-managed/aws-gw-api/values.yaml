@@ -1,0 +1,15 @@
+gateway:
+  https_mode:
+    enabled: true
+    k8s_api_gateway:
+      name: agentcis-stage-alb-gateway
+      gatewayClassName: aws-alb-gateway-class
+      listener_http_namespaces: "All"      # Shared for both HTTP/HTTPS
+      listener_https_namespaces: "All"     # separate HTTPS value
+    aws_alb_config:
+      name: agentcis-staging-alb-lbconfig
+      scheme: internet-facing
+      ipAddressType: ipv4
+      defaultCertificate: "arn:aws:acm:ap-southeast-2:834033184010:certificate/8ed04012-763d-4e2c-8293-79291929e00a"
+    http_to_https_redirect:
+      name: http-to-https-redirect

@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: agentcis-frontend
+  namespace: argocd
+  # finalizers:
+  #   - resources-finalizer.argocd.argoproj.io  
+spec:
+  project: microservice
+  source:
+    repoURL: "https://github.com/GlobalyHub/agentcis-app-gitops.git"
+    targetRevision: "staging"          # branch to deploy
+    path: "gitops/charts/self-managed/frontend" # path to the Helm chart
+    helm:
+      valueFiles:
+        - $values/gitops/values/staging/root-app-values/agent-portal-frontend-values.yml   # your frontend values file
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: frontend
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+      - PruneLast=true 
+      - PrunePropagationPolicy=foreground

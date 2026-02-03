@@ -1,0 +1,63 @@
+---
+- name: Configure Kubelet Credential Provider Args
+  block:
+    - name: 1.1.2 Kubelet service file verification
+      ansible.builtin.shell: |
+        printf "{{ blue_color }}Configuring Kubelet args{{ color_reset }}\n"
+      args:
+        executable: /bin/bash
+
+    - name: A. Check if kubelet args file exists
+      ansible.builtin.stat:
+        path: "{{  k8s_kubelet_config_file  }}"
+      register: kubelet_file
+
+    - name: B. Create kubelet args file if missing
+      ansible.builtin.file:
+        path: "{{  k8s_kubelet_config_file  }}"
+        state: touch
+        mode: '0644'
+      when: not kubelet_file.stat.exists
+
+    - name: C. Check if credential provider args already exist
+      ansible.builtin.shell: |
+        grep -q '^--image-credential-provider-bin-dir={{  k8s_kubelet_binary_dir  }}$' {{  k8s_kubelet_config_file  }} && \
+        grep -q '^--image-credential-provider-config={{  k8s_kubelet_config_dir  }}/config.yaml$' {{  k8s_kubelet_config_file  }}
+      register: args_check
+      failed_when: false
+      changed_when: false
+
+    - name: D. Add or update credential provider arguments
+      ansible.builtin.lineinfile:
+        path: "{{  k8s_kubelet_config_file  }}"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        mode: '0644'
+      loop:
+        - regexp: '^--image-credential-provider-bin-dir='
+          line: '--image-credential-provider-bin-dir={{  k8s_kubelet_binary_dir  }}'
+        - regexp: '^--image-credential-provider-config='
+          line: '--image-credential-provider-config={{  k8s_kubelet_config_dir  }}/config.yaml'
+      register: kubelet_args_result
+      when: args_check.rc != 0
+
+    - name: E. Restart k8s if changes detected
+      ansible.builtin.shell: |
+        printf "{{ blue_color }}Restarting k8s...{{ color_reset }}\n"
+        if snap restart k8s && sleep 5 && snap services k8s | grep -q "active"; then
+          printf "{{ green_color }}k8s restarted successfully{{ color_reset }}\n"
+        else
+          printf "{{ red_color }}k8s restart failed{{ color_reset }}\n"
+          exit 1
+        fi
+      args:
+        executable: /bin/bash
+      when: args_check.rc != 0 and kubelet_args_result is defined and kubelet_args_result.results | map(attribute='changed') | select('equalto', true) | list | length > 0
+
+    - name: F. Print success
+      ansible.builtin.shell: |
+        printf "{{ green_color }}Kubelet args configured{{ color_reset }}\n"
+      args:
+        executable: /bin/bash
+
+  become: yes

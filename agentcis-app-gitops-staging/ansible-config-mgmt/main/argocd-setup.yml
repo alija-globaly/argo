@@ -1,0 +1,12 @@
+- hosts: staging_k8s_master
+  remote_user: ubuntu
+  connection: ssh
+  gather_facts: false
+  vars_files:
+    - "../variables/color-code.yml"
+    - "../variables/k8s-variable.yml"
+  vars:
+    timestamp: "{{ lookup('pipe', 'date +%Y-%m-%d_%H-%M') }}"
+  tasks:
+    - import_tasks: "../tasks/k8s-and-argo-setup/1.1-dependeny-install.yml"
+    - import_tasks: "../tasks/k8s-and-argo-setup/1.2-argocd-setup.yml"

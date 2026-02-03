@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-repo
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  type: git
+  name: any_name_for_identity
+  url: https://github.com/GlobalyHub/agentcis-app-gitops.git
+  username: token_name_xxxx
+  password: github_pat_token_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

@@ -1,0 +1,9 @@
+base_dir: /home/ubuntu/manifest
+
+manifest_dirs:
+  - agent-portal
+  - agentcis-self-hosted
+  - agentcis-v2
+  - data-import
+  - email-summary
+  - superadmin

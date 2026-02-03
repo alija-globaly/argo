@@ -1,0 +1,12 @@
+spec:
+  template:
+    spec:
+      containers:
+      - name: argocd-notifications-controller
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 125m
+            memory: 128Mi

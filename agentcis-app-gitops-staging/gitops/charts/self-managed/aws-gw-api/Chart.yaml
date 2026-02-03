@@ -1,0 +1,34 @@
+apiVersion: v2
+name: aws-gateway  # ← FIXED: was "iname"
+description: >-
+  Helm chart for deploying the Agentcisapp application with AWS ELB Gateway API support.
+  Deploys Gateway API resources with AWS ALB LoadBalancerConfiguration for external traffic.
+type: application
+
+version: 0.1.0
+appVersion: "1.0.0"
+
+maintainers:
+  - name: Subash Chaudhary DevOps
+    email: subash.chaudhary@globalyhub.com  # Fixed markdown
+
+keywords:
+  - gateway-api
+  - aws-alb
+  - elb
+  - kubernetes-gateway
+  - load-balancer
+
+kubeVersion: ">=1.23.0-0"
+dependencies: []
+
+annotations:
+  "artifacthub.io/category": infrastructure
+  "artifacthub.io/containsSecurityUpdates": "false"
+  "artifacthub.io/changesSincePreviousRelease": |
+    - Updated Gateway API with AWS ALB LoadBalancerConfiguration support [skip ci]
+    - Added static listener configuration with templated allowedRoutes [skip ci]
+  "artifacthub.io/isHelmerFriendly": "true"
+  "artifacthub.io/license": "Apache-2.0"
+  "aws.amazon.com/gateway-api": "true"
+  "aws.amazon.com/load-balancer": "ALB"

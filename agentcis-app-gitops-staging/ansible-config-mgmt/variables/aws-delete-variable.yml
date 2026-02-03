@@ -1,0 +1,4 @@
+# vpc
+aws_region: ap-southeast-2
+instance_id: i-0fa4b2e35ae6edc56  # Replace with your instance ID
+security_group_id: sg-0b74b12ad8db77333

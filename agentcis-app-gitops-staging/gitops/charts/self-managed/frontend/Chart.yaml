@@ -1,0 +1,11 @@
+apiVersion: v2
+name: agentcisapp-frontend
+description: Helm chart for deploying the Agentcisapp application
+type: application
+
+version: 0.1.0
+appVersion: "1.0.0"
+
+maintainers:
+  - name: agentcisapp_agent_portal DevOps
+    email: subash.chaudhary@globalyhub.com

@@ -1,0 +1,62 @@
+- name: Create security group
+  amazon.aws.ec2_security_group:
+    name: "{{ security_group_name }}"
+    description: Security group for EC2
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ aws_region }}"
+    rules:
+      # SSH
+      - proto: tcp
+        ports: [22]
+        cidr_ip: 0.0.0.0/0
+        rule_desc: allow-ssh    
+      # HTTP/HTTPS
+      - proto: tcp
+        ports: [80]
+        cidr_ip: 0.0.0.0/0
+        rule_desc: HTTP
+      - proto: tcp
+        ports: [443]
+        cidr_ip: 0.0.0.0/0
+        rule_desc: HTTPS
+      
+      # Kubernetes Control Plane
+      - proto: tcp
+        ports: [6443]
+        cidr_ip: 0.0.0.0/0
+        rule_desc: kube-control-plane
+      
+      # Application Ports
+      - proto: tcp
+        ports: [8080]
+        cidr_ip: 0.0.0.0/0
+        rule_desc: app-8080
+      
+      # AMQP
+      - proto: tcp
+        ports: [5672]
+        cidr_ip: 0.0.0.0/0
+        rule_desc: allowing-amqp
+      
+      # Mailpit
+      - proto: tcp
+        ports: [1025]
+        cidr_ip: 0.0.0.0/0
+        rule_desc: mailpit-global
+
+      # Port 6400 for internal network
+      - proto: tcp
+        ports: [6400]
+        cidr_ip: 172.34.0.0/16
+        rule_desc: port-6400-internal
+      
+      # Allow all traffic from K8s internal network
+      - proto: all
+        from_port: 0
+        to_port: 65535
+        cidr_ip: 172.34.0.0/16
+        rule_desc: allow-all-k8s-internal
+
+    tags:
+      Name: "{{ security_group_name }}"
+      ManagedBy: Ansible

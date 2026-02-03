@@ -1,0 +1,21 @@
+---
+- name: A. Copying script to remote system
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/remote-server-files/scripts/docker-setup.sh"
+    dest: "/tmp/docker-setup.sh"
+    mode: '0755'
+
+- name: B. Docker setup via script
+  ansible.builtin.shell: /tmp/docker-setup.sh
+  args:
+    executable: /bin/bash
+  register: docker_setup_output
+
+- name: C. Display output
+  ansible.builtin.debug:
+    var: docker_setup_output.stdout_lines
+
+- name: D. Clean up script from remote system
+  ansible.builtin.file:
+    path: /tmp/docker-setup.sh
+    state: absent

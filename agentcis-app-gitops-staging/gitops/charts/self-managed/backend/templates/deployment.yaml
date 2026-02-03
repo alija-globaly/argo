@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.backend.name }}-deployment
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.backend.name }}
+
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.backend.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.backend.name }}
+    spec:
+      {{- if .Values.backend.imagePullSecrets.enabled }}
+      imagePullSecrets:
+      - name: {{ .Values.backend.imagePullSecrets.name }}
+      {{- end }}
+      containers:
+      - name: {{ .Values.backend.name }}
+        image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        {{- if .Values.backend.startupCommand.enabled }}
+        command: 
+          - {{ .Values.backend.startupCommand.shell | quote }}
+          - "-c"
+        args:
+          - |
+{{ .Values.backend.startupCommand.command | indent 12 }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.backend.service.port }}
+
+        {{- if .Values.backend.livenessProbe }}
+        livenessProbe:
+          {{- toYaml .Values.backend.livenessProbe | nindent 10 }}
+        {{- end }}
+        
+        {{- if .Values.backend.readinessProbe }}
+        readinessProbe:
+          {{- toYaml .Values.backend.readinessProbe | nindent 10 }}
+        {{- end }}
+        
+        {{- if .Values.backend.startupProbe }}
+        startupProbe:
+          {{- toYaml .Values.backend.startupProbe | nindent 10 }}
+        {{- end }}
+
+        
+
+        {{- if .Values.backend.volumes.enabled }}
+        volumeMounts:
+        {{- if .Values.backend.volumes.env.enabled }}
+        - name: env-volume
+          mountPath: {{ .Values.backend.volumes.env.mountPath | quote }}
+          subPath: {{ .Values.backend.volumes.env.subPath }}
+        {{- end }}
+        {{- if .Values.backend.volumes.logs.enabled }}
+        - name: log-volume
+          mountPath: {{ .Values.backend.volumes.logs.mountPath | quote }}
+          subPath: {{ .Values.backend.volumes.logs.subPath }}
+        {{- end }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+      {{- if .Values.backend.affinity.enabled }}
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          {{- range .Values.backend.affinity.preferredNodes }}
+          - weight: {{ .weight }}
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - {{ .hostname }}
+          {{- end }}
+      {{- end }}
+      {{- if .Values.backend.volumes.enabled }}
+      volumes:
+      {{- if .Values.backend.volumes.env.enabled }}
+      - name: env-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.backend.volumes.env.pvcName }}
+      {{- end }}
+      {{- if .Values.backend.volumes.logs.enabled }}
+      - name: log-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.backend.volumes.logs.pvcName }}
+      {{- end }}
+      {{- end }}
