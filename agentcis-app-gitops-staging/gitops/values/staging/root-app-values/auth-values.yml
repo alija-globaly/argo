@@ -1,10 +1,10 @@
-backend:
-  name: agentcis-backend
+auth:
+  name: agentcis-auth
   replicaCount: 1
 
   image:
-    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/import-backend
-    tag: "import-backend-02-02-be4a310"
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/data-import-auth
+    tag: "import-auth-02-02-be4a310"
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
@@ -15,29 +15,29 @@ backend:
     enabled: true
     shell: /bin/sh
     command: |
-            echo "-------------------------------"
-            echo "k8s => restarting nginx"
-            service nginx restart
-            echo "-------------------------------"
-            echo "k8s => starting NODE backend"
-            echo "-------------------------------"
-            pnpm dev | tee -a /prod/packages/import-backend/logs/data-import-backend.log
+      echo "-------------------------------"
+      echo "k8s => restarting nginx"
+      service nginx restart
+      echo "-------------------------------"
+      echo "k8s => starting AUTHENTCICATION SERVER || NODE "
+      echo "-------------------------------"
+      pnpm dev | tee -a /prod/packages/auth/logs/authentication-server.log 
 
   resources:
     requests:
-      memory: "200Mi"
+      memory: "512Mi"
     limits:
-      memory: "300Mi"
+      memory: "1Gi"
 
   pv:
     config:
-      name: nfs-pv-data-backend-config-test
+      name: nfs-pv-data-auth-config-test
       capacity: 5Gi
       nfsPath: /agentcis-manifest/data-import/config
       nfsServer: nfs.agentcisinteral.com
       reclaimPolicy: Retain
     log:
-      name: nfs-pv-data-backend-log-test
+      name: nfs-pv-data-auth-log-test
       capacity: 5Gi
       nfsPath: /agentcis-pvc/helm-test
       nfsServer: nfs.agentcisinteral.com
@@ -47,14 +47,14 @@ backend:
     enabled: true
     env:
       enabled: true
-      pvcName: nfs-data-import-backend-config-pvc-test
-      mountPath: /prod/packages/import-backend/.env
-      subPath: backend.env
+      pvcName: nfs-data-import-auth-config-pvc-test
+      mountPath: /prod/packages/auth/.env
+      subPath: auth.env
     logs:
       enabled: true
-      pvcName: nfs-data-import-backend-pvc-test
-      mountPath: /prod/packages/import-backend/logs
-      subPath: import-backend-log
+      pvcName: nfs-data-import-auth-pvc-test
+      mountPath: /prod/packages/auth/logs/
+      subPath: import-auth
 
   affinity:
     enabled: false
@@ -64,39 +64,21 @@ backend:
       - hostname: other-server
         weight: 50
 
-  # probe configurations
-  livenessProbe:
-    httpGet:
-      path: /health-check
-      port: 3002
-    initialDelaySeconds: 30
-    periodSeconds: 30
-    failureThreshold: 3
-  
-  readinessProbe:
-    httpGet:
-      path: /health-check
-      port: 3002
-    initialDelaySeconds: 30
-    periodSeconds: 30
-  
-  startupProbe:
-    httpGet:
-      path: /health-check
-      port: 3002
-    initialDelaySeconds: 30
-    periodSeconds: 30
-    failureThreshold: 3
-
-
   service:
     enabled: true
-    type: ClusterIP
-    containerport: 3002
-    svcport: 3002
+    type: NodePort  
+    portNameOne: auth-service
+    portOne: 3010
+    targetPortOne: 3010
+    nodePortOne: 3010
+    portNameTwo: auth-grpc
+    portTwo: 50051
+    targetPortTwo: 50051
+    nodePortTwo: 50051
+  
 
   hpa:
-    enabled: true
+    enabled: false
     minReplicas: 1
     maxReplicas: 3
     cpuUtilization: 50

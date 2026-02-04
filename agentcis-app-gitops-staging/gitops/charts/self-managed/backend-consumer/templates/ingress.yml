@@ -1,0 +1,33 @@
+{{- if .Values.backendConsumer.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.backendConsumer.name }}-ingress
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.backendConsumer.ingress.clusterIssuer }}
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+  labels:
+    app: {{ .Values.backendConsumer.name }}-ingress
+spec:
+  ingressClassName: {{ .Values.backendConsumer.ingress.className }}
+  {{- if and .Values.backendConsumer.ingress.enabled .Values.backendConsumer.ingress.tlsEnabled }}
+  tls:
+  - hosts:
+    - {{ .Values.backendConsumer.ingress.host }}
+    secretName: {{ .Values.backendConsumer.name }}-tls
+  {{- end }}
+  rules:
+  - host: {{ .Values.backendConsumer.ingress.host }}
+    http:
+      paths:
+      - path: {{ .Values.backendConsumer.ingress.path }}
+        pathType: Prefix
+        backendConsumer:
+          service:
+            name: {{ .Values.backendConsumer.name }}-svc
+            port:
+              number: {{ .Values.backendConsumer.service.port }}
+{{- end }}

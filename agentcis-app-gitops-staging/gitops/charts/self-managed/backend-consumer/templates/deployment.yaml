@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.backendConsumer.name }}-deployment
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.backendConsumer.name }}
+
+spec:
+  replicas: {{ .Values.backendConsumer.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.backendConsumer.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.backendConsumer.name }}
+    spec:
+      {{- if .Values.backendConsumer.imagePullSecrets.enabled }}
+      imagePullSecrets:
+      - name: {{ .Values.backendConsumer.imagePullSecrets.name }}
+      {{- end }}
+      containers:
+      - name: {{ .Values.backendConsumer.name }}
+        image: "{{ .Values.backendConsumer.image.repository }}:{{ .Values.backendConsumer.image.tag }}"
+        imagePullPolicy: {{ .Values.backendConsumer.image.pullPolicy }}
+        {{- if .Values.backendConsumer.startupCommand.enabled }}
+        command: 
+          - {{ .Values.backendConsumer.startupCommand.shell | quote }}
+          - "-c"
+        args:
+          - |
+{{ .Values.backendConsumer.startupCommand.command | indent 12 }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.backendConsumer.service.containerport }}
+
+        {{- if .Values.backendConsumer.volumes.enabled }}
+        volumeMounts:
+        {{- if .Values.backendConsumer.volumes.env.enabled }}
+        - name: env-volume
+          mountPath: {{ .Values.backendConsumer.volumes.env.mountPath | quote }}
+          subPath: {{ .Values.backendConsumer.volumes.env.subPath }}
+        {{- end }}
+
+        
+        {{- if .Values.backendConsumer.volumes.logs.enabled }}
+        - name: log-volume
+          mountPath: {{ .Values.backendConsumer.volumes.logs.mountPath | quote }}
+          subPath: {{ .Values.backendConsumer.volumes.logs.subPath }}
+        {{- end }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.backendConsumer.resources | nindent 10 }}
+      {{- if .Values.backendConsumer.affinity.enabled }}
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          {{- range .Values.backendConsumer.affinity.preferredNodes }}
+          - weight: {{ .weight }}
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - {{ .hostname }}
+          {{- end }}
+      {{- end }}
+      {{- if .Values.backendConsumer.volumes.enabled }}
+      volumes:
+      {{- if .Values.backendConsumer.volumes.env.enabled }}
+      - name: env-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.backendConsumer.volumes.env.pvcName }}
+      {{- end }}
+      {{- if .Values.backendConsumer.volumes.logs.enabled }}
+      - name: log-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.backendConsumer.volumes.logs.pvcName }}
+      {{- end }}
+      {{- end }}

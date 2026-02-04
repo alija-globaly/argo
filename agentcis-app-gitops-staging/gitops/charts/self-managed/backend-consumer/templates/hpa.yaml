@@ -1,0 +1,34 @@
+{{- if .Values.backendConsumer.hpa.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.backendConsumer.name }}-hpa
+  namespace: {{ .Release.Namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.backendConsumer.name }}-deployment
+  minReplicas: {{ .Values.backendConsumer.hpa.minReplicas }}
+  maxReplicas: {{ .Values.backendConsumer.hpa.maxReplicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.backendConsumer.hpa.cpuUtilization }}
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 15
+      policies:
+      - type: Pods
+        value: {{ .Values.backendConsumer.hpa.scaleUp.podsValue }}
+        periodSeconds: 30
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Pods
+        value: {{ .Values.backendConsumer.hpa.scaleDown.podsValue }}
+        periodSeconds: 60
+{{- end }}

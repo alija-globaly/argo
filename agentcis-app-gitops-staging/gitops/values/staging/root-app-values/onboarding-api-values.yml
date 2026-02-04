@@ -1,0 +1,112 @@
+backend:
+  name: agentcis-onboarding-backend
+  replicaCount: 1
+
+  image:
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/onboarding-frontend
+    tag: "onboarding-backend-02-02-be4a310"
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets:
+    enabled: false
+    name: ecr-registry-secret
+
+  startupCommand:
+    enabled: true
+    shell: /bin/sh
+    command: |
+      echo "-------------------------------"
+      echo "k8s => restarting nginx"
+      service nginx restart
+      echo "-------------------------------"
+      echo "k8s => starting onboarding-backend || NODE "
+      echo "-------------------------------"
+      pnpm dev | tee -a /prod/packages/onboarding-service/logs/onboarding-backend.log  
+
+  resources:
+    requests:
+      memory: "200Mi"
+    limits:
+      memory: "300Mi"
+
+  pv:
+    config:
+      name: nfs-pv-onboarding-config-test
+      capacity: 5Gi
+      nfsPath: /agentcis-manifest/onboarding/config
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
+    log:
+      name: nfs-pv-onboarding-log-test
+      capacity: 5Gi
+      nfsPath: /agentcis-pvc/helm-test
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
+
+  volumes:
+    enabled: true
+    env:
+      enabled: true
+      pvcName: nfs-onboarding-backend-config-pvc-test
+      mountPath: /prod/packages/onboarding-service/.env
+      subPath: backend.env
+    logs:
+      enabled: true
+      pvcName: nfs-onboarding-backend-pvc-test
+      mountPath: /prod/packages/onboarding-service/logs
+      subPath: onboarding-backend-log
+
+  affinity:
+    enabled: false
+    preferredNodes:
+      - hostname: agentcis-staging-k8s-master-172-34-28-189
+        weight: 100
+      - hostname: other-server
+        weight: 50
+
+
+  service:
+    enabled: true
+    type: ClusterIP
+    containerport: 3003
+    svcport: 3003
+
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    cpuUtilization: 50
+    scaleUp:
+      podsValue: 2
+    scaleDown:
+      podsValue: 1
+
+  ingress:
+    enabled: false
+    clusterIssuer: lets-encrypt
+    className: nginx
+    host: subash.globalyhub.com
+    path: /
+  httproute:
+    enabled: true
+    gateway:
+      name: "agentcisapp-stage-alb-gateway"
+      namespace: "agentcisapp-gateway"
+      sectionName: "https"
+    httpMultipleRoute:
+      paths:
+        - /api/v1/agent-portal
+    urlRewriteEnabled: false
+  targetGroupConfiguration:
+    enabled: true
+    targetType: "instance"
+    healthCheckPath: "/nginx-health"
+    healthCheckProtocol: "HTTP"
+    healthCheckPort: "80"
+    healthCheckInterval: 5
+    healthCheckTimeout: 4      # ← ADD THIS LINE
+    healthyThresholdCount: 2
+    unhealthyThresholdCount: 2
+    matcher:
+      httpCode: "200-399,401-404"
+    

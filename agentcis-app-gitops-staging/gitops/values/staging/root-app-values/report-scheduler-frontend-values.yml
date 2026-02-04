@@ -1,10 +1,10 @@
-auth:
-  name: agentcis-auth
+frontend:
+  name: agentcis-report-scheduler-frontend
   replicaCount: 1
 
   image:
-    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/data-import-auth
-    tag: "import-auth-02-02-be4a310"
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/report-scheduler-frontend
+    tag: report-scheduler-frontend-01-19-596de9b
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
@@ -12,49 +12,55 @@ auth:
     name: ecr-registry-secret
 
   startupCommand:
-    enabled: true
+    enabled: false
     shell: /bin/sh
     command: |
       echo "-------------------------------"
       echo "k8s => restarting nginx"
-      service nginx restart
       echo "-------------------------------"
-      echo "k8s => starting AUTHENTCICATION SERVER || NODE "
+      service nginx start
+      echo "k8s => restarting nginx"
       echo "-------------------------------"
-      pnpm dev | tee -a /prod/packages/auth/logs/authentication-server.log 
 
   resources:
     requests:
-      memory: "512Mi"
+      memory: "500Mi"
     limits:
-      memory: "1Gi"
+      memory: "1000Mi"
+
 
   pv:
     config:
-      name: nfs-pv-data-auth-config-test
+      name: nfs-pv-report-scheduler-config-test
       capacity: 5Gi
-      nfsPath: /agentcis-manifest/data-import/config
+      nfsPath: /agentcis-manifest/report-scheduler/config
       nfsServer: nfs.agentcisinteral.com
       reclaimPolicy: Retain
     log:
-      name: nfs-pv-data-auth-log-test
+      name: nfs-pv-report-scheduler-test
       capacity: 5Gi
       nfsPath: /agentcis-pvc/helm-test
       nfsServer: nfs.agentcisinteral.com
       reclaimPolicy: Retain
 
+
   volumes:
     enabled: true
     env:
       enabled: true
-      pvcName: nfs-data-import-auth-config-pvc-test
-      mountPath: /prod/packages/auth/.env
-      subPath: auth.env
+      pvcName: nfs-report-scheduler-config-pvc-test
+      nginxOneMountPath: /etc/nginx/nginx.conf
+      nginxOneSubPath: nginx.conf
+
+      nginxTwoMountPath: /etc/nginx/conf.d/report-scheduler-frontend-nginx.conf
+      nginxTwoSubPath: report-scheduler-frontend-nginx.conf
+
+
     logs:
       enabled: true
-      pvcName: nfs-data-import-auth-pvc-test
-      mountPath: /prod/packages/auth/logs/
-      subPath: import-auth
+      pvcName: nfs-report-scheduler-pvc-test 
+      mountPath: /var/log/nginx
+      subPath: report-scheduler-frontend-log
 
   affinity:
     enabled: false
@@ -64,6 +70,36 @@ auth:
       - hostname: other-server
         weight: 50
 
+  # probe configurations
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 30
+  
+  startupProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 10
+    
+    
+  service:
+    enabled: true
+    type: ClusterIP
+    containerport: 80
+    svcport: 80
 
   hpa:
     enabled: false
@@ -74,33 +110,31 @@ auth:
       podsValue: 2
     scaleDown:
       podsValue: 1
-
+      
   ingress:
     enabled: false
-    clusterIssuer: lets-encrypt
-    className: nginx
-    host: subash.globalyhub.com
+    clusterIssuer: lets-encrypt-production
+    tlsEnabled: false
+    host: staging.agentcis.com
     path: /
+
   httproute:
-    enabled: true
+    enabled: false
+    path: "/agent-portal"
     gateway:
       name: "agentcisapp-stage-alb-gateway"
       namespace: "agentcisapp-gateway"
       sectionName: "https"
-    httpMultipleRoute:
-      paths:
-        - /api/v1/agent-portal
-    urlRewriteEnabled: false
+
+
   targetGroupConfiguration:
-    enabled: true
+    enabled: false
     targetType: "instance"
     healthCheckPath: "/nginx-health"
     healthCheckProtocol: "HTTP"
-    healthCheckPort: "80"
     healthCheckInterval: 5
     healthCheckTimeout: 4      # ← ADD THIS LINE
     healthyThresholdCount: 2
     unhealthyThresholdCount: 2
     matcher:
       httpCode: "200-399,401-404"
-    

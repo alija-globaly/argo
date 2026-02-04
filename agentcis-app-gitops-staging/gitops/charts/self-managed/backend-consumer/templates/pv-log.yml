@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.backendConsumer.pv.log.name }}
+spec:
+  capacity:
+    storage: {{ .Values.backendConsumer.pv.log.capacity | default "5Gi" }}
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: {{ .Values.backendConsumer.pv.log.reclaimPolicy | default "Retain" }}
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: {{ .Values.backendConsumer.pv.log.nfsPath }}
+    server: {{ .Values.backendConsumer.pv.log.nfsServer }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.backendConsumer.volumes.logs.pvcName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.backendConsumer.pv.log.capacity | default "5Gi" }}
+  volumeName: {{ .Values.backendConsumer.pv.log.name }}
+  storageClassName: ""
