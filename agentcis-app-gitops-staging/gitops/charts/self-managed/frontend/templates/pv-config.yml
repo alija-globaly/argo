@@ -22,7 +22,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Values.frontend.pvc.config.name }}
+  name: {{ .Values.frontend.volumes.env.pvcName }}
   namespace: {{ .Release.Namespace }}
 spec:
   accessModes:

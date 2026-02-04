@@ -55,9 +55,13 @@ spec:
         volumeMounts:
         {{- if .Values.frontend.volumes.env.enabled }}
         - name: env-volume
-          mountPath: {{ .Values.frontend.volumes.env.mountPath | quote }}
-          subPath: {{ .Values.frontend.volumes.env.subPath }}
+          mountPath: {{ .Values.frontend.volumes.env.nginxOneMountPath | quote }}
+          subPath: {{ .Values.frontend.volumes.env.nginxOneSubPath }}
+        - name: env-volume
+          mountPath: {{ .Values.frontend.volumes.env.nginxTwoMountPath | quote }}
+          subPath: {{ .Values.frontend.volumes.env.nginxTwoSubPath }}
         {{- end }}
+
         {{- if .Values.frontend.volumes.logs.enabled }}
         - name: log-volume
           mountPath: {{ .Values.frontend.volumes.logs.mountPath | quote }}

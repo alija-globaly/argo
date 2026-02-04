@@ -32,24 +32,24 @@ backend:
 
   pv:
     config:
-      name: nfs-pv-data-import-config
+      name: nfs-pv-data-import-config-test
       capacity: 5Gi
       nfsPath: /agentcis-manifest/data-import/config
       nfsServer: nfs.agentcisinteral.com
       reclaimPolicy: Retain
     log:
-      name: nfs-pv-data-import-log
+      name: nfs-pv-data-import-test
       capacity: 5Gi
       nfsPath: /agentcis-pvc/helm-test
       nfsServer: nfs.agentcisinteral.com
       reclaimPolicy: Retain
 
+
   pvc:
     config:
-      name: nfs-config-pvc
+      name: nfs-data-import-config-pvc-test
     log:
-      name: nfs-data-import-pvc
-  
+      name: nfs-data-import-pvc-test
 
   volumes:
     enabled: true

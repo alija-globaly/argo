@@ -32,39 +32,39 @@ frontend:
       memory: "1000Mi"
 
 
+
   pv:
     config:
-      name: nfs-pv-data-import-config
+      name: nfs-pv-data-import-config-test
       capacity: 5Gi
       nfsPath: /agentcis-manifest/data-import/config
       nfsServer: nfs.agentcisinteral.com
       reclaimPolicy: Retain
     log:
-      name: nfs-pv-data-import-log
+      name: nfs-pv-data-import-test
       capacity: 5Gi
       nfsPath: /agentcis-pvc/helm-test
       nfsServer: nfs.agentcisinteral.com
       reclaimPolicy: Retain
 
-  pvc:
-    config:
-      name: nfs-config-pvc
-    log:
-      name: nfs-data-import-pvc
-  
 
   volumes:
     enabled: true
     env:
       enabled: true
-      pvcName: nfs-config-pvc
-      mountPath: /prod/packages/email-summary-service/.env
-      subPath: frontend.env
+      pvcName: nfs-data-import-config-pvc-test
+      nginxOneMountPath: /etc/nginx/nginx.conf
+      nginxOneSubPath: nginx.conf
+
+      nginxTwoMountPath: /etc/nginx/conf.d/frontend-nginx.conf
+      nginxTwoSubPath: frontend-nginx.conf
+
+
     logs:
       enabled: true
-      pvcName: nfs-data-import-pvc
-      mountPath: /prod/packages/email-summary-service/logs
-      subPath: email-summary-frontend-log
+      pvcName: nfs-data-import-pvc-test 
+      mountPath: /var/log/nginx
+      subPath: import-frontend-log
 
   affinity:
     enabled: false
