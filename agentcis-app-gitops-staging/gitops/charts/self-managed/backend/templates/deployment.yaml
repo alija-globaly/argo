@@ -33,7 +33,7 @@ spec:
 {{ .Values.backend.startupCommand.command | indent 12 }}
         {{- end }}
         ports:
-        - containerPort: {{ .Values.backend.service.port }}
+        - containerPort: {{ .Values.backend.service.containerport }}
 
         {{- if .Values.backend.livenessProbe }}
         livenessProbe:
@@ -50,8 +50,6 @@ spec:
           {{- toYaml .Values.backend.startupProbe | nindent 10 }}
         {{- end }}
 
-        
-
         {{- if .Values.backend.volumes.enabled }}
         volumeMounts:
         {{- if .Values.backend.volumes.env.enabled }}
@@ -59,6 +57,8 @@ spec:
           mountPath: {{ .Values.backend.volumes.env.mountPath | quote }}
           subPath: {{ .Values.backend.volumes.env.subPath }}
         {{- end }}
+
+        
         {{- if .Values.backend.volumes.logs.enabled }}
         - name: log-volume
           mountPath: {{ .Values.backend.volumes.logs.mountPath | quote }}

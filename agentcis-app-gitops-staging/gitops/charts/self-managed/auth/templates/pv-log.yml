@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.auth.pv.log.name }}
+spec:
+  capacity:
+    storage: {{ .Values.auth.pv.log.capacity | default "5Gi" }}
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: {{ .Values.auth.pv.log.reclaimPolicy | default "Retain" }}
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: {{ .Values.auth.pv.log.nfsPath }}
+    server: {{ .Values.auth.pv.log.nfsServer }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.auth.volumes.logs.pvcName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.auth.pv.log.capacity | default "5Gi" }}
+  volumeName: {{ .Values.auth.pv.log.name }}
+  storageClassName: ""

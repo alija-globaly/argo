@@ -21,9 +21,6 @@ frontend:
       service nginx start
       echo "k8s => restarting nginx"
       echo "-------------------------------"
-      echo "k8s => starting NODE frontend"
-      echo "-------------------------------"
-      node .output/server/index.mjs
 
   resources:
     requests:
@@ -101,11 +98,10 @@ frontend:
     
   service:
     enabled: true
-    port: 80
-    portName: nginx-http
+    type: NodePort
     # type: ClusterIP
-    targetPort: 80
-    type: NodePort    
+    containerport: 80
+    svcport: 80
 
   hpa:
     enabled: false

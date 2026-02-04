@@ -33,7 +33,7 @@ spec:
 {{ .Values.frontend.startupCommand.command | indent 12 }}
         {{- end }}
         ports:
-        - containerPort: {{ .Values.frontend.service.port }}
+        - containerPort: {{ .Values.frontend.service.containerport }}
 
         {{- if .Values.frontend.livenessProbe }}
         livenessProbe:

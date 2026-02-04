@@ -1,33 +1,33 @@
-{{- if .Values.backend.ingress.enabled }}
+{{- if .Values.auth.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.backend.name }}-ingress
+  name: {{ .Values.auth.name }}-ingress
   namespace: {{ .Release.Namespace }}
   annotations:
-    cert-manager.io/cluster-issuer: {{ .Values.backend.ingress.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.auth.ingress.clusterIssuer }}
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "100m"
   labels:
-    app: {{ .Values.backend.name }}-ingress
+    app: {{ .Values.auth.name }}-ingress
 spec:
-  ingressClassName: {{ .Values.backend.ingress.className }}
-  {{- if and .Values.backend.ingress.enabled .Values.backend.ingress.tlsEnabled }}
+  ingressClassName: {{ .Values.auth.ingress.className }}
+  {{- if and .Values.auth.ingress.enabled .Values.auth.ingress.tlsEnabled }}
   tls:
   - hosts:
-    - {{ .Values.backend.ingress.host }}
-    secretName: {{ .Values.backend.name }}-tls
+    - {{ .Values.auth.ingress.host }}
+    secretName: {{ .Values.auth.name }}-tls
   {{- end }}
   rules:
-  - host: {{ .Values.backend.ingress.host }}
+  - host: {{ .Values.auth.ingress.host }}
     http:
       paths:
-      - path: {{ .Values.backend.ingress.path }}
+      - path: {{ .Values.auth.ingress.path }}
         pathType: Prefix
-        backend:
+        auth:
           service:
-            name: {{ .Values.backend.name }}-svc
+            name: {{ .Values.auth.name }}-svc
             port:
-              number: {{ .Values.backend.service.port }}
+              number: {{ .Values.auth.service.port }}
 {{- end }}

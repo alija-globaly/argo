@@ -1,34 +1,34 @@
-{{- if .Values.backend.auth.enabled }}
+{{- if .Values.auth.auth.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Values.backend.name }}-auth
+  name: {{ .Values.auth.name }}-auth
   namespace: {{ .Release.Namespace }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ .Values.backend.name }}-deployment
-  minReplicas: {{ .Values.backend.auth.minReplicas }}
-  maxReplicas: {{ .Values.backend.auth.maxReplicas }}
+    name: {{ .Values.auth.name }}-deployment
+  minReplicas: {{ .Values.auth.auth.minReplicas }}
+  maxReplicas: {{ .Values.auth.auth.maxReplicas }}
   metrics:
   - type: Resource
     resource:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: {{ .Values.backend.auth.cpuUtilization }}
+        averageUtilization: {{ .Values.auth.auth.cpuUtilization }}
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 15
       policies:
       - type: Pods
-        value: {{ .Values.backend.auth.scaleUp.podsValue }}
+        value: {{ .Values.auth.auth.scaleUp.podsValue }}
         periodSeconds: 30
     scaleDown:
       stabilizationWindowSeconds: 300
       policies:
       - type: Pods
-        value: {{ .Values.backend.auth.scaleDown.podsValue }}
+        value: {{ .Values.auth.auth.scaleDown.podsValue }}
         periodSeconds: 60
 {{- end }}

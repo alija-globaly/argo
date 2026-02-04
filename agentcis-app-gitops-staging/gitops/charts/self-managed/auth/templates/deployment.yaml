@@ -33,25 +33,10 @@ spec:
 {{ .Values.auth.startupCommand.command | indent 12 }}
         {{- end }}
         ports:
-        - containerPort: {{ .Values.auth.service.port }}
-
-        {{- if .Values.auth.livenessProbe }}
-        livenessProbe:
-          {{- toYaml .Values.auth.livenessProbe | nindent 10 }}
-        {{- end }}
-        
-        {{- if .Values.auth.readinessProbe }}
-        readinessProbe:
-          {{- toYaml .Values.auth.readinessProbe | nindent 10 }}
-        {{- end }}
-        
-        {{- if .Values.auth.startupProbe }}
-        startupProbe:
-          {{- toYaml .Values.auth.startupProbe | nindent 10 }}
-        {{- end }}
+        - containerPort: {{ .Values.auth.service.portOne }}
+        - containerPort: {{ .Values.auth.service.portTwo }}
 
         
-
         {{- if .Values.auth.volumes.enabled }}
         volumeMounts:
         {{- if .Values.auth.volumes.env.enabled }}

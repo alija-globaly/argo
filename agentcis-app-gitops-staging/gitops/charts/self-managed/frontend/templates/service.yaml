@@ -19,8 +19,8 @@ spec:
   type: {{ .Values.frontend.service.type }}
   ports:
     - name: {{ .Values.frontend.name }}-port
-      port: {{ .Values.frontend.service.port }}
-      targetPort: {{ .Values.frontend.service.port }}
+      port: {{ .Values.frontend.service.svcport }}
+      targetPort: {{ .Values.frontend.service.containerport }}
       protocol: TCP
   ipFamilyPolicy: SingleStack
   ipFamilies: 

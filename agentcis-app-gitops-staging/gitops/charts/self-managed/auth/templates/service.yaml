@@ -21,16 +21,12 @@ spec:
     - name: {{ .Values.auth.service.portNameOne }}
       port: {{ .Values.auth.service.portOne }}
       targetPort: {{ .Values.auth.service.targetPortOne }}
-      {{- if eq .Values.auth.service.type "NodePort" }}
       nodePort: {{ .Values.auth.service.nodePortOne }}
-      {{- end }}
 
     - name: {{ .Values.auth.service.portNameTwo }}
       port: {{ .Values.auth.service.portTwo }}
       targetPort: {{ .Values.auth.service.targetPortTwo }}
-      {{- if eq .Values.auth.service.type "NodePort" }}
       nodePort: {{ .Values.auth.service.nodePortTwo }}
-      {{- end }}
 
       protocol: TCP
   ipFamilyPolicy: SingleStack

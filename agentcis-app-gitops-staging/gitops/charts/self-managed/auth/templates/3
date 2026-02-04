@@ -4,44 +4,57 @@ auth:
 
   image:
     repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/data-import-auth
-    tag: import-auth-01-19-596de9b
+    tag: "import-auth-02-02-be4a310"
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
-    enabled: true
+    enabled: false
     name: ecr-registry-secret
 
   startupCommand:
-    enabled: false
+    enabled: true
     shell: /bin/sh
     command: |
       echo "-------------------------------"
       echo "k8s => restarting nginx"
-      service nginx restart 
+      service nginx restart
       echo "-------------------------------"
-      echo "k8s => starting data-import consumer"
+      echo "k8s => starting AUTHENTCICATION SERVER || NODE "
       echo "-------------------------------"
-      pnpm start:import-consumer | tee -a /prod/packages/auth/logs/authentication-server.log
-  
+      pnpm dev | tee -a /prod/packages/auth/logs/authentication-server.log 
 
   resources:
     requests:
-      memory: "500Mi"
+      memory: "512Mi"
     limits:
-      memory: "1000Mi"
+      memory: "1Gi"
+
+  pv:
+    config:
+      name: nfs-pv-data-auth-config-test
+      capacity: 5Gi
+      nfsPath: /agentcis-manifest/data-import/config
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
+    log:
+      name: nfs-pv-data-auth-log-test
+      capacity: 5Gi
+      nfsPath: /agentcis-pvc/helm-test
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
 
   volumes:
     enabled: true
     env:
       enabled: true
-      pvcName: nfs-config-pvc
+      pvcName: nfs-data-import-auth-config-pvc-test
       mountPath: /prod/packages/auth/.env
       subPath: auth.env
     logs:
       enabled: true
-      pvcName: nfs-data-import-pvc
+      pvcName: nfs-data-import-auth-pvc-test
       mountPath: /prod/packages/auth/logs/
-      subPath: email-summary-auth-log
+      subPath: import-auth
 
   affinity:
     enabled: false
@@ -50,51 +63,6 @@ auth:
         weight: 100
       - hostname: other-server
         weight: 50
-
-  # probe configurations
-  livenessProbe:
-    httpGet:
-      path: /health-check
-      port: 3002
-    initialDelaySeconds: 30
-    periodSeconds: 30
-    failureThreshold: 3
-  
-  readinessProbe:
-    httpGet:
-      path: /health-check
-      port: 3002
-    initialDelaySeconds: 30
-    periodSeconds: 30
-  
-  startupProbe:
-    httpGet:
-      path: /health-check
-      port: 3002
-    initialDelaySeconds: 30
-    periodSeconds: 30
-    failureThreshold: 3
-
-    
-  # service:
-  #   enabled: true
-  #   port: 80
-  #   portName: auth-service
-  #   # type: ClusterIP
-  #   targetPort: 80
-  #   type: NodePort    
-
-  service:
-    enabled: true
-    type: NodePort  
-    portNameOne: auth-service
-    portOne: 3010
-    targetPortOne: 3010
-    nodePortOne: 3010
-    portNameTwo: auth-grpc
-    portTwo: 50051
-    targetPortTwo: 50051
-    nodePortTwo: 50051
 
 
   hpa:
@@ -106,30 +74,33 @@ auth:
       podsValue: 2
     scaleDown:
       podsValue: 1
+
   ingress:
     enabled: false
-    clusterIssuer: lets-encrypt-production
-    tlsEnabled: false
-    host: staging.agentcis.com
+    clusterIssuer: lets-encrypt
+    className: nginx
+    host: subash.globalyhub.com
     path: /
-
   httproute:
-    enabled: false
-    path: "/agent-portal"
+    enabled: true
     gateway:
       name: "agentcisapp-stage-alb-gateway"
       namespace: "agentcisapp-gateway"
       sectionName: "https"
-
-
+    httpMultipleRoute:
+      paths:
+        - /api/v1/agent-portal
+    urlRewriteEnabled: false
   targetGroupConfiguration:
-    enabled: false
+    enabled: true
     targetType: "instance"
     healthCheckPath: "/nginx-health"
     healthCheckProtocol: "HTTP"
+    healthCheckPort: "80"
     healthCheckInterval: 5
     healthCheckTimeout: 4      # ← ADD THIS LINE
     healthyThresholdCount: 2
     unhealthyThresholdCount: 2
     matcher:
       httpCode: "200-399,401-404"
+    
