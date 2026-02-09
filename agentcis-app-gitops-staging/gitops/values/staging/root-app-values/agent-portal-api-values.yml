@@ -1,10 +1,10 @@
 backend:
-  name: agent-portal
+  name: agent-portal-backend
   replicaCount: 1
 
   image:
     repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/agent-portal-api
-    tag: agent-portal-api-12-18-daceaf9
+    tag: agent-portal-api-02-04-d8ea2f3
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
@@ -17,40 +17,44 @@ backend:
     command: |
       echo "-------------------------------"
       echo "k8s => restarting nginx"
-      echo "-------------------------------"
-      service nginx start
-      echo "k8s => restarting nginx"
+      service nginx restart
       echo "-------------------------------"
       echo "k8s => starting NODE backend"
       echo "-------------------------------"
-      mkdir -p public/uploads/
-      mkdir -p storage/uploads
-      mkdir -p storage/framework/views
-      mkdir -p storage/framework/cache
-      mkdir -p storage/framework/sessions
-      mkdir -p storage/logs
-      chmod -R 777  storage/
-      chmod -R 777  bootstrap/cache
-      chmod -R 777  public/uploads/
-      php-fpm -y /usr/local/etc/php-fpm.conf -R
+      npm run dev | tee -a /prod/packages/agent-portal-service/logs/agent-portal-backend.log
+
   resources:
     requests:
-      memory: "500Mi"
+      memory: "200Mi"
     limits:
-      memory: "1000Mi"
+      memory: "200Mi"
+
+  pv:
+    config:
+      name: nfs-pv-agent-portal-backend-config-test
+      capacity: 5Gi
+      nfsPath: /agentcis-manifest/agent-portal/config
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
+    log:
+      name: nfs-pv-agent-portal-backend-log-test
+      capacity: 5Gi
+      nfsPath: /agentcis-pvc/helm-test
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
 
   volumes:
-    enabled: false
+    enabled: true
     env:
-      enabled: false
-      pvcName: nfs-email-summary-config-pvc
-      mountPath: /prod/packages/email-summary-service/.env
+      enabled: true
+      pvcName: nfs-agent-portal-backend-config-pvc-test
+      mountPath: /prod/packages/agent-portal-service/.env
       subPath: backend.env
     logs:
-      enabled: false
-      pvcName: nfs-email-summary-log-pvc
-      mountPath: /prod/packages/email-summary-service/logs
-      subPath: email-summary-backend-log
+      enabled: true
+      pvcName: nfs-agent-portal-backend-pvc-test
+      mountPath: /prod/packages/agent-portal-service/logs
+      subPath: agent-portal-backend-log 
 
   affinity:
     enabled: false
@@ -60,13 +64,39 @@ backend:
       - hostname: other-server
         weight: 50
 
+  # probe configurations
+  livenessProbe:
+    httpGet:
+      path: /agent-portal/health-check 
+      port: 3007
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /agent-portal/health-check 
+      port: 3007
+    initialDelaySeconds: 30
+    periodSeconds: 30
+  
+  startupProbe:
+    httpGet:
+      path: /agent-portal/health-check 
+      port: 3007
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+
   service:
-    enabled: true
+    port: 3007
+    portName: backend-node-port
     type: ClusterIP
-    port: 80
+    containerport: 3007
+    svcport: 3007
 
   hpa:
-    enabled: true
+    enabled: false
     minReplicas: 1
     maxReplicas: 3
     cpuUtilization: 50
@@ -75,7 +105,7 @@ backend:
     scaleDown:
       podsValue: 1
   ingress:
-    enabled: true
+    enabled: false
     clusterIssuer: lets-encrypt-staging
     tlsEnabled: false
     host: subash.globalyhub.com

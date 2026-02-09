@@ -1,5 +1,5 @@
 frontend:
-  name: agentcis-data-import-frontend
+  name: agentcis-frontend
   replicaCount: 1
 
   image:
@@ -21,6 +21,9 @@ frontend:
       service nginx start
       echo "k8s => restarting nginx"
       echo "-------------------------------"
+      echo "k8s => starting NODE frontend"
+      echo "-------------------------------"
+      node .output/server/index.mjs
 
   resources:
     requests:
@@ -98,10 +101,11 @@ frontend:
     
   service:
     enabled: true
-    type: NodePort
+    port: 80
+    portName: nginx-http
     # type: ClusterIP
-    containerport: 80
-    svcport: 80
+    targetPort: 80
+    type: NodePort    
 
   hpa:
     enabled: false

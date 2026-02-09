@@ -25,9 +25,9 @@ auth:
 
   resources:
     requests:
-      memory: "512Mi"
+      memory: "500Mi"
     limits:
-      memory: "1Gi"
+      memory: "500Mi"
 
   pv:
     config:
@@ -52,7 +52,7 @@ auth:
       subPath: auth.env
     logs:
       enabled: true
-      pvcName: nfs-data-import-auth-pvc-test
+      pvcName: nfs-data-import-auth-log-pvc-test
       mountPath: /prod/packages/auth/logs/
       subPath: import-auth
 
@@ -68,13 +68,13 @@ auth:
     enabled: true
     type: NodePort  
     portNameOne: auth-service
-    portOne: 3010
-    targetPortOne: 3010
-    nodePortOne: 3010
+    portOne: 3011
+    targetPortOne: 3011
+    nodePortOne: 3011
     portNameTwo: auth-grpc
-    portTwo: 50051
-    targetPortTwo: 50051
-    nodePortTwo: 50051
+    portTwo: 50052
+    targetPortTwo: 50052
+    nodePortTwo: 50052
   
 
   hpa:

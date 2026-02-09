@@ -1,66 +1,60 @@
-frontend:
-  name: agentcis-email-summary-frontend
+backend:
+  name: agentcis-email-summary-backend
   replicaCount: 1
 
   image:
-    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/email-summary-frontend
-    tag: email-summary-frontend-01-19-596de9b
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/email-summary-backend
+    tag: "email-summary-backend-01-19-596de9b"
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
-    enabled: false
+    enabled: true
     name: ecr-registry-secret
 
   startupCommand:
-    enabled: false
+    enabled: true
     shell: /bin/sh
     command: |
       echo "-------------------------------"
       echo "k8s => restarting nginx"
+      service nginx restart 
       echo "-------------------------------"
-      service nginx start
-      echo "k8s => restarting nginx"
+      echo "k8s => starting NODE backend"
       echo "-------------------------------"
+      pnpm dev | tee -a /prod/packages/email-summary-service/logs/email-summary-backend.log
 
   resources:
     requests:
-      memory: "500Mi"
+      memory: "390Mi"
     limits:
-      memory: "1000Mi"
-
+      memory: "390Mi"
 
   pv:
     config:
-      name: nfs-pv-email-summary-config-test
+      name: nfs-pv-email-summary-config-backend-test
       capacity: 5Gi
       nfsPath: /agentcis-manifest/email-summary/config
       nfsServer: nfs.agentcisinteral.com
       reclaimPolicy: Retain
     log:
-      name: nfs-pv-email-summary-test
+      name: nfs-pv-email-summary-log-backend-test
       capacity: 5Gi
       nfsPath: /agentcis-pvc/helm-test
       nfsServer: nfs.agentcisinteral.com
       reclaimPolicy: Retain
 
-
   volumes:
     enabled: true
     env:
       enabled: true
-      pvcName: nfs-email-summary-config-pvc-test
-      nginxOneMountPath: /etc/nginx/nginx.conf
-      nginxOneSubPath: nginx.conf
-
-      nginxTwoMountPath: /etc/nginx/conf.d/email-summary-frontend-nginx.conf
-      nginxTwoSubPath: email-summary-frontend-nginx.conf
-
-
+      pvcName: nfs-email-summary-backend-config-pvc-test
+      mountPath: /prod/packages/email-summary-service/.env
+      subPath: backend.env
     logs:
       enabled: true
-      pvcName: nfs-email-summary-pvc-test 
-      mountPath: /var/log/nginx
-      subPath: email-summary-frontend-log
+      pvcName: nfs-email-summary-backend-pvc-test
+      mountPath: /prod/packages/email-summary-service/logs
+      subPath: email-summary-backend-log
 
   affinity:
     enabled: false
@@ -73,36 +67,37 @@ frontend:
   # probe configurations
   livenessProbe:
     httpGet:
-      path: /
-      port: 80
+      path: /health-check
+      port: 3005
     initialDelaySeconds: 30
     periodSeconds: 30
     failureThreshold: 3
   
   readinessProbe:
     httpGet:
-      path: /
-      port: 80
+      path: /health-check
+      port: 3005
     initialDelaySeconds: 30
     periodSeconds: 30
   
   startupProbe:
     httpGet:
-      path: /
-      port: 80
+      path: /health-check
+      port: 3005
     initialDelaySeconds: 30
     periodSeconds: 30
-    failureThreshold: 10
-    
-    
+    failureThreshold: 3
+
+
+
   service:
     enabled: true
     type: ClusterIP
-    containerport: 80
-    svcport: 80
+    containerport: 3005
+    svcport: 3005
 
   hpa:
-    enabled: false
+    enabled: true
     minReplicas: 1
     maxReplicas: 3
     cpuUtilization: 50
@@ -110,27 +105,29 @@ frontend:
       podsValue: 2
     scaleDown:
       podsValue: 1
+
   ingress:
     enabled: false
-    clusterIssuer: lets-encrypt-production
-    tlsEnabled: false
-    host: staging.agentcis.com
+    clusterIssuer: lets-encrypt
+    className: nginx
+    host: subash.globalyhub.com
     path: /
-
   httproute:
-    enabled: false
-    path: "/agent-portal"
+    enabled: true
     gateway:
       name: "agentcisapp-stage-alb-gateway"
       namespace: "agentcisapp-gateway"
       sectionName: "https"
-
-
+    httpMultipleRoute:
+      paths:
+        - /api/v1/agent-portal
+    urlRewriteEnabled: false
   targetGroupConfiguration:
-    enabled: false
+    enabled: true
     targetType: "instance"
     healthCheckPath: "/nginx-health"
     healthCheckProtocol: "HTTP"
+    healthCheckPort: "80"
     healthCheckInterval: 5
     healthCheckTimeout: 4      # ← ADD THIS LINE
     healthyThresholdCount: 2

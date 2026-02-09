@@ -3,12 +3,12 @@ backend:
   replicaCount: 1
 
   image:
-    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/sms-campaign-frontend
-    tag: "sms-campaign-frontend-02-02-be4a310"
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/sms-campaign-backend
+    tag: "sms-campaign-backend-02-02-be4a310"
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
-    enabled: false
+    enabled: true
     name: ecr-registry-secret
 
   startupCommand:
@@ -16,18 +16,18 @@ backend:
     shell: /bin/sh
     command: |
       echo "-------------------------------"
-      echo "k8s => restarting nginx"
-      service nginx restart 
-      echo "-------------------------------"
-      echo "k8s => starting NODE backend"
-      echo "-------------------------------"
-      pnpm dev | tee -a /prod/packages/sms-campaign/logs/sms-campaign-backend.log
-  
+        echo "k8s => restarting nginx"
+        service nginx restart 
+        echo "-------------------------------"
+        echo "k8s => starting NODE backend"
+        echo "-------------------------------"
+        pnpm dev | tee -a /prod/packages/sms-campaign/logs/sms-campaign-backend.log
+
   resources:
     requests:
-      memory: "200Mi"
+      memory: "250Mi"
     limits:
-      memory: "300Mi"
+      memory: "250Mi"
 
   pv:
     config:
@@ -69,24 +69,24 @@ backend:
     httpGet:
       path: /sms-campaign/webhook/health
       port: 3004
-    initialDelaySeconds: 10
-    periodSeconds: 10
+    initialDelaySeconds: 30
+    periodSeconds: 30
     failureThreshold: 3
   
   readinessProbe:
     httpGet:
       path: /sms-campaign/webhook/health
       port: 3004
-    initialDelaySeconds: 5
-    periodSeconds: 10
+    initialDelaySeconds: 30
+    periodSeconds: 30
   
-  startupProbe:
-    httpGet:
-      path: /sms-campaign/webhook/health
-      port: 3004
-    initialDelaySeconds: 15
-    periodSeconds: 5
-    failureThreshold: 10  
+  # startupProbe:
+  #   httpGet:
+  #     path: /sms-campaign/webhook/health
+  #     port: 3004
+  #   initialDelaySeconds: 30
+  #   periodSeconds: 30
+  #   failureThreshold: 10  
 
 
   service:
@@ -133,4 +133,3 @@ backend:
     unhealthyThresholdCount: 2
     matcher:
       httpCode: "200-399,401-404"
-    

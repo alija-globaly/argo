@@ -8,7 +8,7 @@ frontend:
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
-    enabled: false
+    enabled: true
     name: ecr-registry-secret
 
   startupCommand:
@@ -24,20 +24,20 @@ frontend:
 
   resources:
     requests:
-      memory: "500Mi"
+      memory: "90Mi"
     limits:
-      memory: "1000Mi"
+      memory: "90Mi"
 
 
   pv:
     config:
-      name: nfs-pv-sms-campaign-config-test
+      name: nfs-pv-sms-campaign-config-frontend-test
       capacity: 5Gi
       nfsPath: /agentcis-manifest/sms-campaign/config
       nfsServer: nfs.agentcisinteral.com
       reclaimPolicy: Retain
     log:
-      name: nfs-pv-sms-campaign-test
+      name: nfs-pv-sms-campaign-log-frontend-test
       capacity: 5Gi
       nfsPath: /agentcis-pvc/helm-test
       nfsServer: nfs.agentcisinteral.com
@@ -48,7 +48,7 @@ frontend:
     enabled: true
     env:
       enabled: true
-      pvcName: nfs-sms-campaign-config-pvc-test
+      pvcName: nfs-sms-campaign-config-frontend-pvc-test
       nginxOneMountPath: /etc/nginx/nginx.conf
       nginxOneSubPath: nginx.conf
 
@@ -58,7 +58,7 @@ frontend:
 
     logs:
       enabled: true
-      pvcName: nfs-sms-campaign-pvc-test 
+      pvcName: nfs-sms-campaign-log-frontend-pvc-test 
       mountPath: /var/log/nginx
       subPath: sms-campaign-frontend-log
 

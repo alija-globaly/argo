@@ -10,11 +10,12 @@ spec:
     namespace: argocd
     server: https://kubernetes.default.svc
   project: default
+
   source:
-    path: "gitops/argocd/applications/staging"
-    repoURL: "https://github.com/GlobalyHub/agentcis-app-gitops.git"
-    targetRevision: "staging"
-    directory:                    # ADD THIS
+    path: "agentcis-app-gitops-staging/gitops/argocd/applications/staging"
+    repoURL: "https://github.com/alija-globaly/argo.git"
+    targetRevision: "main"
+    directory:                   
       recurse: true    
   syncPolicy:
     automated:

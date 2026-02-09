@@ -8,7 +8,7 @@ backend:
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
-    enabled: false
+    enabled: true
     name: ecr-registry-secret
 
   startupCommand:
@@ -21,24 +21,23 @@ backend:
       echo "-------------------------------"
       echo "k8s => starting NODE backend"
       echo "-------------------------------"
-      tail -f /dev/null
-      #pnpm dev | tee -a /prod/packages/email-summary-service/logs/email-summary-backend.log
+      pnpm dev | tee -a /prod/packages/email-summary-service/logs/email-summary-backend.log
 
   resources:
     requests:
-      memory: "200Mi"
+      memory: "390Mi"
     limits:
-      memory: "300Mi"
+      memory: "390Mi"
 
   pv:
     config:
-      name: nfs-pv-email-summary-config-test
+      name: nfs-pv-email-summary-config-backend-test
       capacity: 5Gi
       nfsPath: /agentcis-manifest/email-summary/config
       nfsServer: nfs.agentcisinteral.com
       reclaimPolicy: Retain
     log:
-      name: nfs-pv-email-summary-log-test
+      name: nfs-pv-email-summary-log-backend-test
       capacity: 5Gi
       nfsPath: /agentcis-pvc/helm-test
       nfsServer: nfs.agentcisinteral.com
@@ -135,4 +134,3 @@ backend:
     unhealthyThresholdCount: 2
     matcher:
       httpCode: "200-399,401-404"
-    

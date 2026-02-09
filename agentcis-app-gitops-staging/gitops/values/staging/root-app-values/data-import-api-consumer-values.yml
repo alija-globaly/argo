@@ -4,7 +4,7 @@ backendConsumer:
 
   image:
     repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/backend-consumer
-    tag: "import-backend-01-19-596de9b"
+    tag: "import-backend-02-06-de44f32"
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
@@ -64,6 +64,31 @@ backendConsumer:
       - hostname: other-server
         weight: 50
 
+  # probe configurations
+  livenessProbe:
+    httpGet:
+      path: /health-check
+      port: 3002
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /health-check
+      port: 3002
+    initialDelaySeconds: 30
+    periodSeconds: 30
+  
+  startupProbe:
+    httpGet:
+      path: /health-check
+      port: 3002
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+
+
 
   service:
     enabled: true
@@ -109,4 +134,3 @@ backendConsumer:
     unhealthyThresholdCount: 2
     matcher:
       httpCode: "200-399,401-404"
-    

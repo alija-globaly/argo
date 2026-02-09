@@ -3,8 +3,8 @@ frontend:
   replicaCount: 1
 
   image:
-    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/agent-portal-frontend
-    tag: agent-portal-frontend-12-18-0b38f69
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/sub-agent-control-frontend
+    tag: sub-agent-control-frontend-01-16-6f6659f
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
@@ -12,7 +12,7 @@ frontend:
     name: ecr-registry-secret
 
   startupCommand:
-    enabled: true
+    enabled: false
     shell: /bin/sh
     command: |
       echo "-------------------------------"
@@ -27,22 +27,42 @@ frontend:
 
   resources:
     requests:
-      memory: "500Mi"
+      memory: "100Mi"
     limits:
-      memory: "1000Mi"
+      memory: "100Mi"
+
+  pv:
+    config:
+      name: nfs-pv-agent-portal-config-test
+      capacity: 5Gi
+      nfsPath: /agentcis-manifest/agent-portal/config
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
+    log:
+      name: nfs-pv-agent-portal-log-test
+      capacity: 5Gi
+      nfsPath: /agentcis-pvc/helm-test
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
+
 
   volumes:
-    enabled: false
+    enabled: true
     env:
-      enabled: false
-      pvcName: nfs-email-summary-config-pvc
-      mountPath: /prod/packages/email-summary-service/.env
-      subPath: frontend.env
+      enabled: true
+      pvcName: nfs-agent-portal-config-pvc-test
+      nginxOneMountPath: /etc/nginx/nginx.conf
+      nginxOneSubPath: nginx.conf
+
+      nginxTwoMountPath: /etc/nginx/conf.d/sub-agent-control-frontend-nginx.conf
+      nginxTwoSubPath: sub-agent-control-frontend-nginx.conf
+
+
     logs:
-      enabled: false
-      pvcName: nfs-email-summary-log-pvc
-      mountPath: /prod/packages/email-summary-service/logs
-      subPath: email-summary-frontend-log
+      enabled: true
+      pvcName: nfs-agent-portal-log-pvc-test
+      mountPath: /var/log/nginx
+      subPath: sub-agent-control-frontend-log
 
   affinity:
     enabled: false
@@ -52,13 +72,38 @@ frontend:
       - hostname: other-server
         weight: 50
 
+  # probe configurations
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 30
+  
+  startupProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 10
+    
   service:
     enabled: true
     type: ClusterIP
-    port: 80
+    containerport: 80
+    svcport: 80
 
   hpa:
-    enabled: true
+    enabled: false
     minReplicas: 1
     maxReplicas: 3
     cpuUtilization: 50
@@ -67,7 +112,7 @@ frontend:
     scaleDown:
       podsValue: 1
   ingress:
-    enabled: true
+    enabled: false
     clusterIssuer: lets-encrypt-production
     tlsEnabled: false
     host: staging.agentcis.com

@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: agentcisapp-auth
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io/background   
+spec:
+  project: microservice
+  source:
+    repoURL: "https://github.com/alija-globaly/argo.git"
+    targetRevision: "main"          # branch to deploy
+    path: "agentcis-app-gitops-staging/gitops/charts/self-managed/auth" # path to the Helm chart
+    helm:
+      valueFiles:
+        - $values/gitops/values/staging/root-app-values/auth-values.yml   # your auth values file
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: agentcisapp-auth
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - PruneLast=true       
+      - ServerSideApply=true
+      - PrunePropagationPolicy=foreground      

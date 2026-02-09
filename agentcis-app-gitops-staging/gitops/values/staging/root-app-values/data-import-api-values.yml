@@ -8,7 +8,7 @@ backend:
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
-    enabled: false
+    enabled: true
     name: ecr-registry-secret
 
   startupCommand:
@@ -52,7 +52,7 @@ backend:
       subPath: backend.env
     logs:
       enabled: true
-      pvcName: nfs-data-import-backend-pvc-test
+      pvcName: nfs-data-import-backend-log-pvc-test
       mountPath: /prod/packages/import-backend/logs
       subPath: import-backend-log
 
@@ -133,4 +133,3 @@ backend:
     unhealthyThresholdCount: 2
     matcher:
       httpCode: "200-399,401-404"
-    
