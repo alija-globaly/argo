@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: agentcisapp-parent
+  name: agentcisapp-
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io/background   
@@ -16,7 +16,7 @@ spec:
         - $values/gitops/values/staging/root-app-values/data-import-frontend-values.yml   # your frontend values file
   destination:
     server: https://kubernetes.default.svc
-    namespace: agentcisapp-parent
+    namespace: agentcisapp-frontend
   syncPolicy:
     automated:
       prune: true
