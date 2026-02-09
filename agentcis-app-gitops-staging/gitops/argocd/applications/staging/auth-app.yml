@@ -6,7 +6,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io/background   
 spec:
-  project: microservice
+  project: default
   source:
     repoURL: "https://github.com/alija-globaly/argo.git"
     targetRevision: "main"          # branch to deploy
