@@ -3,17 +3,15 @@ kind: Application
 metadata:
   name: agentcisapp-auth
   namespace: argocd
-  # finalizers:
-  #   - resources-finalizer.argocd.argoproj.io/background   
 spec:
   project: default
   source:
     repoURL: "https://github.com/alija-globaly/argo.git"
-    targetRevision: "main"          # branch to deploy
-    path: "agentcis-app-gitops-staging/gitops/charts/self-managed/auth" # path to the Helm chart
+    targetRevision: "main"
+    path: "agentcis-app-gitops-staging/gitops/charts/self-managed/auth"
     helm:
       valueFiles:
-        - ../../../gitops/values/staging/root-app-values/auth-values.yml   # your auth values file
+        - ../../../values/staging/root-app-values/auth-values.yml 
   destination:
     server: https://kubernetes.default.svc
     namespace: agentcisapp-auth
@@ -24,6 +22,6 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true
-      - PruneLast=true       
+      - PruneLast=true
       - ServerSideApply=true
-      - PrunePropagationPolicy=foreground      
+      - PrunePropagationPolicy=foreground
