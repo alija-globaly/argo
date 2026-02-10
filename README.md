@@ -5,4 +5,4 @@ kubectl port-forward \
   svc/argocd-server -n argocd 8080:443
 
 argocd admin initial-password -n argocd 
-NF1ofy5EXTnIqbSr
+jFsnF1h-sBStCu0N
