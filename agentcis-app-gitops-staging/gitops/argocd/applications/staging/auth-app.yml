@@ -13,7 +13,7 @@ spec:
     path: "agentcis-app-gitops-staging/gitops/charts/self-managed/auth" # path to the Helm chart
     helm:
       valueFiles:
-        - $values/gitops/values/staging/root-app-values/auth-values.yml   # your auth values file
+        - ../../../gitops/values/staging/root-app-values/auth-values.yml   # your auth values file
   destination:
     server: https://kubernetes.default.svc
     namespace: agentcisapp-auth
