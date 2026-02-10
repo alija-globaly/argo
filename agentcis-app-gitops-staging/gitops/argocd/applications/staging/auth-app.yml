@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: agentcisapp-auth
+  name: agentcis-data-import-auth-test
   namespace: argocd
 spec:
   project: default
@@ -14,7 +14,7 @@ spec:
         - ../../../values/staging/root-app-values/auth-values.yml 
   destination:
     server: https://kubernetes.default.svc
-    namespace: agentcisapp-auth
+    namespace: agentcis-data-import-auth-test
   syncPolicy:
     automated:
       prune: true
