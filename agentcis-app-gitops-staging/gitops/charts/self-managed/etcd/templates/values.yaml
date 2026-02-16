@@ -1,0 +1,29 @@
+replicaCount: 3  # 3 or 5 for production
+
+image:
+  repository: quay.io/coreos/etcd
+  tag: v3.5.12
+  pullPolicy: IfNotPresent
+
+service:
+  name: etcd
+  clientPort: 2379
+  peerPort: 2380
+
+storage:
+  size: 10Gi
+  storageClass: ""  # Use default or specify
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+# For NFS storage
+pv:
+  enabled: true
+  nfsServer: nfs.agentcisinteral.com
+  nfsPath: /agentcis-pvc/helm-test/etcd-data

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app.kubernetes.io/name: lavinmq-operator
+    app.kubernetes.io/managed-by: Helm
+  ports:
+    - name: {{ .Values.service.nameUi }} 
+      protocol: {{ .Values.service.protocol }}
+      port: {{ .Values.service.portOne }}
+      targetPort: {{ .Values.service.targetPortOne }}
+      nodePort: {{ .Values.service.nodePortOne }}
+    - name: {{ .Values.service.nameAmqp }}
+      protocol: {{ .Values.service.protocol }}
+      port: {{ .Values.service.portTwo }}
+      targetPort: {{ .Values.service.targetPortTwo }}
+      nodePort: {{ .Values.service.nodePortTwo }}

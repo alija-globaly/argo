@@ -1,0 +1,38 @@
+namespace:
+  name: default
+
+
+lavinmq:
+  name: my-first-lavinmq
+  namespace: default
+  replicas: 1
+  image: cloudamqp/lavinmq:latest
+  accessMode: ReadWriteOnce
+  storage: 5Gi
+  storageClassName: null
+  amqpPort: 5672
+  mgmtPort: 15672
+
+
+pv:
+  enabled: true
+  name: lavinmq-data-pv
+  size: 5Gi
+  accessMode: ReadWriteOnce
+  nfsServer: nfs.agentcisinteral.com
+  nfsPath: /agentcis-pvc/helm-test/lavinmq-data
+  reclaimPolicy: Retain
+  storageClass: null
+
+service:
+  name: my-test-lavinmq-nodeport
+  type: NodePort
+  protocol: TCP
+  nameUi: http-ui
+  portOne: 15672
+  targetPortOne: 15672
+  nodePortOne: 31672
+  nameAmqp: amqp
+  portTwo: 5672
+  targetPortTwo: 5672
+  nodePortTwo: 30672

@@ -1,0 +1,22 @@
+# templates/my-lavinmq.yaml
+apiVersion: cloudamqp.com/v1alpha1
+kind: LavinMQ
+metadata:
+  name: {{ .Values.lavinmq.name }}
+  namespace: {{ .Values.lavinmq.namespace }}
+
+spec:
+  replicas: {{ .Values.lavinmq.replicas }}
+  image: {{ .Values.lavinmq.image }}
+  dataVolumeClaim:
+    accessModes:
+      - {{ .Values.lavinmq.accessMode }}
+    resources:
+      requests:
+        storage: {{ .Values.lavinmq.storage }}
+    storageClassName: "{{ .Values.lavinmq.storageClassName }}"
+  config:
+    amqp:
+      port: {{ .Values.lavinmq.amqpPort }}
+    mgmt:
+      port: {{ .Values.lavinmq.mgmtPort }}
