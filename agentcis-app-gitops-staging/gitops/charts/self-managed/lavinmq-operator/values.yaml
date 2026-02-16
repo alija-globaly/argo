@@ -1,6 +1,6 @@
-# namespace:
-#   create: true
-#   name: lavinmq-operator-system
+namespace:
+  create: true
+  name: lavinmq-operator-system
 
 
 lavinmq:

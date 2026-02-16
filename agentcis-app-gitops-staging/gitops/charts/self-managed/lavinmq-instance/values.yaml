@@ -25,6 +25,7 @@ pv:
   storageClass: null
 
 service:
+  enabled: true
   name: my-test-lavinmq-nodeport
   type: NodePort
   protocol: TCP

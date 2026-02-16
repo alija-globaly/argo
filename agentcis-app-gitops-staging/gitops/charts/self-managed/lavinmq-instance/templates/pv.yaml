@@ -1,3 +1,4 @@
+{{- if .Values.pv.enabled }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -12,3 +13,4 @@ spec:
     path: {{ .Values.pv.nfsPath }}
   persistentVolumeReclaimPolicy: {{ .Values.pv.reclaimPolicy }}
   storageClassName: {{ .Values.pv.storageClass | quote }}
+{{- end }}
