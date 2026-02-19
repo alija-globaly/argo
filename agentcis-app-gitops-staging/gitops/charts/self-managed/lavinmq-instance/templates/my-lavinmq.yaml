@@ -8,15 +8,21 @@ metadata:
 spec:
   replicas: {{ .Values.lavinmq.replicas }}
   image: {{ .Values.lavinmq.image }}
+
+
+  etcdEndpoints: 
+      - "http://my-etcd.default.svc.cluster.local:2379"
+
   dataVolumeClaim:
     accessModes:
       - {{ .Values.lavinmq.accessMode }}
     resources:
       requests:
-        storage: {{ .Values.lavinmq.storage }}
-    storageClassName: "{{ .Values.lavinmq.storageClassName }}"
+        storage: {{ .Values.pv.size }}
+    storageClassName: {{ .Values.storageClass }}
   config:
     amqp:
       port: {{ .Values.lavinmq.amqpPort }}
     mgmt:
       port: {{ .Values.lavinmq.mgmtPort }}
+ 

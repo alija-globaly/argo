@@ -2,27 +2,5 @@ namespace:
   create: true
   name: lavinmq-operator-system
 
-
-lavinmq:
-  name: my-first-lavinmq
-  namespace: default
-  replicas: 1
-  image: cloudamqp/lavinmq:latest
-  accessMode: ReadWriteOnce
-  storage: 5Gi
-  storageClassName: null
-  amqpPort: 5672
-  mgmtPort: 15672
-
-
-pv:
-  name: lavinmq-data-pv
-  size: 5Gi
-  accessMode: ReadWriteOnce
-  nfsServer: nfs.agentcisinteral.com
-  nfsPath: /agentcis-pvc/helm-test/lavinmq-data
-  reclaimPolicy: Retain
-  storageClass: null
-
 cert-manager:
   enabled: false

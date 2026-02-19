@@ -1,0 +1,34 @@
+# etcd-values.yaml - cleaned up
+replicaCount: 1
+auth:
+  rbac:
+    create: false
+  token:
+    enabled: false
+image:
+  registry: docker.io
+  repository: bitnamilegacy/etcd
+  tag: 3.6.4-debian-12-r3
+service:
+  type: ClusterIP
+
+persistence:
+  enabled: true
+  storageClass: "nfs-client"   
+  accessModes: ReadWriteOnce
+  size: 10Gi
+  nfsPath:  /agentcis-pvc/helm-test/etcd-data
+  reclaimPolicy: Retain
+
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+autoCompactionMode: revision
+autoCompactionRetention: "1000"
+metrics:
+  enabled: true

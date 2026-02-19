@@ -5,24 +5,27 @@ namespace:
 lavinmq:
   name: my-first-lavinmq
   namespace: default
-  replicas: 1
+  replicas: 2
   image: cloudamqp/lavinmq:latest
   accessMode: ReadWriteOnce
-  storage: 5Gi
-  storageClassName: null
   amqpPort: 5672
   mgmtPort: 15672
+  # clustering: true
+
+storageClass: manual-storage
 
 
 pv:
   enabled: true
-  name: lavinmq-data-pv
   size: 5Gi
   accessMode: ReadWriteOnce
   nfsServer: nfs.agentcisinteral.com
-  nfsPath: /agentcis-pvc/helm-test/lavinmq-data
+  nfsPathOne: /agentcis-pvc/helm-test/lavinmq-data-0
   reclaimPolicy: Retain
-  storageClass: null
+  nameOne: lavinmq-pv-0
+  nameTwo: lavinmq-pv-1
+
+
 
 service:
   enabled: true
