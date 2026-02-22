@@ -1,6 +1,6 @@
 apiVersion: v2
 name: lavinmq-instance
-description: Complete Helm chart for LavinMQ instance
+description: Complete Helm chart for LavinMQ with instance support
 type: application
 version: 1.0.0
 appVersion: "0.2.0"

@@ -1,7 +1,9 @@
 namespace:
   name: default
 
-
+# -----------------------------------------------
+# LavinMQ instance config
+# -----------------------------------------------
 lavinmq:
   name: my-first-lavinmq
   namespace: default
@@ -10,23 +12,21 @@ lavinmq:
   accessMode: ReadWriteOnce
   amqpPort: 5672
   mgmtPort: 15672
-  # clustering: true
-
-storageClass: manual-storage
+  etcdEndpoint: "http://my-etcd.default.svc.cluster.local:2379"
 
 
+
+# -----------------------------------------------
+# Storage config (used by my-lavinmq.yaml)
+# -----------------------------------------------
 pv:
-  enabled: true
   size: 5Gi
-  accessMode: ReadWriteOnce
-  nfsServer: nfs.agentcisinteral.com
-  nfsPathOne: /agentcis-pvc/helm-test/lavinmq-data-0
-  reclaimPolicy: Retain
-  nameOne: lavinmq-pv-0
-  nameTwo: lavinmq-pv-1
+  storageClass: nfs-client-lavinmq         # ← must match storageClass.name above
 
 
-
+# -----------------------------------------------
+# NodePort service config
+# -----------------------------------------------
 service:
   enabled: true
   name: my-test-lavinmq-nodeport

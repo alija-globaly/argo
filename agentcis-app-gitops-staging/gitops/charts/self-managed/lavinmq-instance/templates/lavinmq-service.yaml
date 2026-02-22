@@ -8,7 +8,6 @@ spec:
   type: {{ .Values.service.type }}
   selector:
     app.kubernetes.io/name: lavinmq-operator
-    app.kubernetes.io/managed-by: Helm
   ports:
     - name: {{ .Values.service.nameUi }} 
       protocol: {{ .Values.service.protocol }}
