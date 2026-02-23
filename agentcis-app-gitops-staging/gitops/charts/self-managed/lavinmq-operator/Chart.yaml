@@ -4,9 +4,3 @@ description: Complete Helm chart for LavinMQ with operator support
 type: application
 version: 1.0.0
 appVersion: "0.2.0"
-
-dependencies:
-  - name: cert-manager
-    version: v1.13.0
-    repository: https://charts.jetstack.io
-    condition: cert-manager.enabled
