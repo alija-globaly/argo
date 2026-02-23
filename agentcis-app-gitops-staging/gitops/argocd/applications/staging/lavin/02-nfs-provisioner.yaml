@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nfs-provisioner
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"    # ← deploys second
+spec:
+  project: default
+  source:
+    repoURL: "https://github.com/alija-globaly/argo.git"
+    targetRevision: "main"
+    path: "agentcis-app-gitops-staging/gitops/charts/self-managed/nfs-provisioner"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nfs-provisioner
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - PruneLast=true
+      - ServerSideApply=true
+      - PrunePropagationPolicy=foreground
+      

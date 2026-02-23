@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: lavinmq-etcd
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"    # ← deploys fourth
+spec:
+  project: default
+  source:
+    - repoURL: https://registry-1.docker.io/bitnamicharts   # bitnami helm repo
+      chart: etcd
+      targetRevision: "12.0.18"      # Chart Version of etcd
+      helm:
+        valueFiles:
+          - ../../../values/staging/root-app-values/lavinmq-etcd-values.yaml     # ← references your values file
+     
+    - repoURL: https://github.com/alija-globaly/argo.git     
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: lavinmq-infra
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - PruneLast=true
+      - ServerSideApply=true
+      - PrunePropagationPolicy=foreground

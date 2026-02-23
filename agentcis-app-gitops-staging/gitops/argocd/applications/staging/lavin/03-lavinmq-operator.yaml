@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: lavinmq-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"    # ← deploys third
+spec:
+  project: default
+  source:
+    repoURL: "https://github.com/alija-globaly/argo.git"
+    targetRevision: "main"
+    path: "agentcis-app-gitops-staging/gitops/charts/self-managed/lavinmq-operator"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: lavinmq-operator-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - PruneLast=true
+      - ServerSideApply=true
+      - PrunePropagationPolicy=foreground
+      
