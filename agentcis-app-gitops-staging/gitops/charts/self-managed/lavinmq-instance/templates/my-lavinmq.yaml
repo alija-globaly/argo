@@ -2,7 +2,7 @@ apiVersion: cloudamqp.com/v1alpha1
 kind: LavinMQ
 metadata:
   name: {{ .Values.lavinmq.name }}
-  namespace: {{ .Values.lavinmq.namespace }}
+  namespace: {{ .Values.namespace.name }}
 spec:
   replicas: {{ .Values.lavinmq.replicas }}
   image: {{ .Values.lavinmq.image }}

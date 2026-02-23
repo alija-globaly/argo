@@ -2,7 +2,7 @@
 nfs-etcd:
   nfs:
     server: nfs.agentcisinteral.com
-    path: /agentcis-pvc/helm-test/etcd-data
+    path: /agentcis-pvc/helm-test/lavinmq-etcd-data
   storageClass:
     name: nfs-client-etcd
     reclaimPolicy: Retain
@@ -12,7 +12,7 @@ nfs-etcd:
 nfs-lavinmq:
   nfs:
     server: nfs.agentcisinteral.com
-    path: /agentcis-pvc/helm-test/lavin
+    path: /agentcis-pvc/helm-test/lavinmq-data
   storageClass:
     name: nfs-client-lavinmq
     reclaimPolicy: Retain

@@ -1,18 +1,17 @@
 namespace:
-  name: default
+  name: lavinmq-infra
 
 # -----------------------------------------------
 # LavinMQ instance config
 # -----------------------------------------------
 lavinmq:
-  name: my-first-lavinmq
-  namespace: default
+  name: lavinmq
   replicas: 2
-  image: cloudamqp/lavinmq:latest
+  image: cloudamqp/lavinmq:2.6.8
   accessMode: ReadWriteOnce
   amqpPort: 5672
   mgmtPort: 15672
-  etcdEndpoint: "http://my-etcd.default.svc.cluster.local:2379"
+  etcdEndpoint: "http://lavinmq-etcd.lavinmq-infra.svc.cluster.local:2379"
 
 
 
@@ -29,7 +28,7 @@ pv:
 # -----------------------------------------------
 service:
   enabled: true
-  name: my-test-lavinmq-nodeport
+  name: lavinmq-nodeport
   type: NodePort
   protocol: TCP
   nameUi: http-ui

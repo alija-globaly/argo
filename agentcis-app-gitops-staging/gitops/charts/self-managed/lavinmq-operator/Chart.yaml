@@ -4,3 +4,4 @@ description: Complete Helm chart for LavinMQ with operator support
 type: application
 version: 1.0.0
 appVersion: "0.2.0"
+
