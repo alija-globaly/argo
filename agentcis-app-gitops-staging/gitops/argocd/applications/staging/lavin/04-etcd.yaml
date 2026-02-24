@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   sources:
-  - repoURL: https://registry-1.docker.io/bitnamicharts  # ✅ Plain URL
+  - repoURL: https://charts.bitnami.com/bitnami  # ✅ Plain URL
     chart: etcd
     targetRevision: "12.0.18"
     helm:
