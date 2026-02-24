@@ -8,17 +8,17 @@ metadata:
 spec:
   project: default
   sources:
-  - repoURL: https://charts.bitnami.com/bitnami  # ✅ Plain URL
+  - repoURL: https://charts.bitnami.com/bitnami
     chart: etcd
     targetRevision: "12.0.18"
     helm:
       valueFiles:
-      - /agentcis-app-gitops-staging/gitops/values/staging/root-app-values/lavinmq-etcd-values.yaml
-  - repoURL: https://github.com/alija-globaly/argo.git     # ✅ Plain URL
+      - values/staging/root-app-values/lavinmq-etcd-values.yaml  # ← relative path
+  - repoURL: https://github.com/alija-globaly/argo.git
     targetRevision: main
     ref: values
   destination:
-    server: https://kubernetes.default.svc                 # ✅ Plain URL
+    server: https://kubernetes.default.svc
     namespace: lavinmq-infra
   syncPolicy:
     automated:
