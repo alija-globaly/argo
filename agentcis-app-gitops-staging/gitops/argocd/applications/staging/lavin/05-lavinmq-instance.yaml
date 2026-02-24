@@ -8,15 +8,20 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://your-git-repo.com/lavinmq-helm
-    targetRevision: HEAD
-    path: lavinmq-instance
+    repoURL: https://registry-1.docker.io/bitnamicharts
+    targetRevision: "main"
+    path: "agentcis-app-gitops-staging/gitops/charts/self-managed/lavinmq-instance"
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: lavinmq-infra
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - RespectIgnoreDifferences=true
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - PruneLast=true
+      - ServerSideApply=true
+      - PrunePropagationPolicy=foreground
+      
