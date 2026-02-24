@@ -4,31 +4,29 @@ metadata:
   name: lavinmq-etcd
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "4"    # ← deploys fourth
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   project: default
   sources:
-    - repoURL: https://registry-1.docker.io/bitnamicharts   # bitnami helm repo
-      chart: etcd
-      targetRevision: "12.0.18"      # Chart Version of etcd
-      helm:
-        valueFiles:
-          - /agentcis-app-gitops-staging/gitops/values/staging/root-app-values/lavinmq-etcd-values.yaml     # ← references your values file
-     
-    - repoURL: https://github.com/alija-globaly/argo.git     
-      targetRevision: main
-      ref: values
-      
+  - repoURL: https://registry-1.docker.io/bitnamicharts  # ✅ Plain URL
+    chart: etcd
+    targetRevision: "12.0.18"
+    helm:
+      valueFiles:
+      - /agentcis-app-gitops-staging/gitops/values/staging/root-app-values/lavinmq-etcd-values.yaml
+  - repoURL: https://github.com/alija-globaly/argo.git     # ✅ Plain URL
+    targetRevision: main
+    ref: values
   destination:
-    server: https://kubernetes.default.svc
+    server: https://kubernetes.default.svc                 # ✅ Plain URL
     namespace: lavinmq-infra
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
-      - ApplyOutOfSyncOnly=true
-      - PruneLast=true
-      - ServerSideApply=true
-      - PrunePropagationPolicy=foreground
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - PruneLast=true
+    - ServerSideApply=true
+    - PrunePropagationPolicy=foreground
