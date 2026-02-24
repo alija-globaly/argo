@@ -13,7 +13,7 @@ spec:
     targetRevision: "12.0.18"
     helm:
       valueFiles:
-      - $values_repo/agentcis-app-gitops-staging/values/staging/root-app-values/lavinmq-etcd-values.yaml
+      - $values_repo/agentcis-app-gitops-staging/gitops/values/staging/root-app-values/lavinmq-etcd-values.yaml
   - repoURL: https://github.com/alija-globaly/argo.git
     targetRevision: main
     ref: values_repo
