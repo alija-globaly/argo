@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://registry-1.docker.io/bitnamicharts
+    repoURL: "https://github.com/alija-globaly/argo.git"
     targetRevision: "main"
     path: "agentcis-app-gitops-staging/gitops/charts/self-managed/lavinmq-instance"
   destination:
@@ -24,4 +24,3 @@ spec:
       - PruneLast=true
       - ServerSideApply=true
       - PrunePropagationPolicy=foreground
-      
