@@ -1,5 +1,5 @@
 # NFS provisioner for etcd
-nfs-etcd:
+nfs-lavinmq-etcd:
   nfs:
     server: nfs.agentcisinteral.com
     path: /agentcis-pvc/helm-test/lavinmq-etcd-data
@@ -16,4 +16,4 @@ nfs-lavinmq:
   storageClass:
     name: nfs-client-lavinmq
     reclaimPolicy: Retain
-    archiveOnDelete: "false"
+    archiveOnDelete: "false" 
