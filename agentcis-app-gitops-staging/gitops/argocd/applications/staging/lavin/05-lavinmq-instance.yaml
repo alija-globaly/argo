@@ -13,7 +13,7 @@ spec:
     path: "agentcis-app-gitops-staging/gitops/charts/self-managed/lavinmq-instance"
     helm:
       valueFiles:
-        - /agentcis-app-gitops-staging/gitops/charts/self-managed/lavinmq-instance/values.yaml
+        - values.yaml 
 
   destination:
     server: https://kubernetes.default.svc
