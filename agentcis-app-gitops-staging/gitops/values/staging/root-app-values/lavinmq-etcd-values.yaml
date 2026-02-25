@@ -38,6 +38,6 @@ autoCompactionRetention: "1000"
 metrics:
   enabled: true
 
-# Add this anywhere at the root level of the file
-preUpgrade:
+
+preUpgradeJob:
   enabled: false
