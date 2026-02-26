@@ -7,6 +7,13 @@ metadata:
     argocd.argoproj.io/sync-wave: "4"
 spec:
   project: default
+  # Fix OutOfSync: ignore kube-controller-manager status & managedFields
+  ignoreDifferences:
+  - group: apps
+    kind: StatefulSet
+    managedFieldsManagers:     
+    - kube-controller-manager
+
   sources:
   - repoURL: https://charts.bitnami.com/bitnami
     chart: etcd
