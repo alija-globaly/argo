@@ -7,13 +7,15 @@ metadata:
     argocd.argoproj.io/sync-wave: "4"
 spec:
   project: default
-  # Fix OutOfSync: ignore kube-controller-manager status & managedFields
+  # Fix OutOfSync with ServerSideApply: managedFieldsManagers broken with server-side diff
+  # (ArgoCD #20178). Use explicit jsonPointers - reliable workaround.
   ignoreDifferences:
   - group: apps
     kind: StatefulSet
-    managedFieldsManagers:     
-    - kube-controller-manager
-
+    jsonPointers:
+    - /status
+    - /metadata/managedFields
+    - /spec/volumeClaimTemplates
   sources:
   - repoURL: https://charts.bitnami.com/bitnami
     chart: etcd
