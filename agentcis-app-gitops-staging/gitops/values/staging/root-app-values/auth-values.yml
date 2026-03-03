@@ -16,10 +16,7 @@ auth:
     shell: /bin/sh
     command: |
       echo "-------------------------------"
-      echo "k8s => restarting nginx"
-      service nginx restart
-      echo "-------------------------------"
-      echo "k8s => starting AUTHENTCICATION SERVER || NODE "
+      echo "k8s => starting AUTHENTCATION SERVER || NODE "
       echo "-------------------------------"
       pnpm dev | tee -a /prod/packages/auth/logs/authentication-server.log 
 
@@ -64,10 +61,10 @@ auth:
       - hostname: other-server
         weight: 50
 
-  grpcPort: 50052
+  # App binds to 50051 (auth.service.ts). Service exposes 50052 externally; targetPort must match container.
+  grpcPort: 50051
 
-  # Auth is gRPC-only (auth.service.ts binds to GRPC_HOST, default 0.0.0.0:50051; gitops uses portTwo 50052).
-  # No HTTP or gRPC health service in auth.proto — use tcpSocket to check gRPC port is listening.
+  # Auth is gRPC-only. Use tcpSocket to check gRPC port is listening.
   livenessProbe:
     enabled: true
     initialDelaySeconds: 20
@@ -80,8 +77,12 @@ auth:
     periodSeconds: 10
     failureThreshold: 3
 
+  # Give the auth server time to start (gRPC on 50051) before liveness/readiness run.
   startupProbe:
-    enabled: false
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 5  
 
   service:
     enabled: true
@@ -91,9 +92,9 @@ auth:
     targetPortOne: 3011
     nodePortOne: 3011
     portNameTwo: auth-grpc
-    portTwo: 50052
-    targetPortTwo: 50052
-    nodePortTwo: 50052
+    portTwo: 50051         # same as targetPort; app listens on 50051
+    targetPortTwo: 50051
+    nodePortTwo: 30551     # NodePort must be in 30000-32767; 50051 not allowed
   
 
   hpa:
