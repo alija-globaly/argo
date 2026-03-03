@@ -90,7 +90,6 @@ backend:
     periodSeconds: 10
     failureThreshold: 5
 
-
   service:
     enabled: true
     type: ClusterIP
@@ -98,7 +97,7 @@ backend:
     svcport: 3002
 
   hpa:
-    enabled: true
+    enabled: false
     minReplicas: 1
     maxReplicas: 3
     cpuUtilization: 50
@@ -106,7 +105,6 @@ backend:
       podsValue: 2
     scaleDown:
       podsValue: 1
-
 
   ingress:
     enabled: false

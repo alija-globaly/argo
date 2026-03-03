@@ -82,7 +82,7 @@ auth:
     enabled: true
     initialDelaySeconds: 5
     periodSeconds: 10
-    failureThreshold: 5  
+    failureThreshold: 6
 
   service:
     enabled: true
