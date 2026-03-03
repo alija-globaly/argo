@@ -11,10 +11,10 @@ spec:
   source:
     repoURL: "https://github.com/alija-globaly/argo.git"
     targetRevision: "main"          # branch to deploy
-    path: "agentcis-app-gitops-staging/gitops/charts/self-managed/backend" # path to the Helm chart
+    path: "agentcis-app-gitops-staging/gitops/charts/self-managed/backend-consumer" # path to the Helm chart
     helm:
       valueFiles:
-        - ../../../gitops/values/staging/root-app-values/data-import-api-consumer-values.yml   # your backend consumer values file
+        - ../../../values/staging/root-app-values/data-import-api-consumer-values.yml   # your backend consumer values file
   destination:
     server: https://kubernetes.default.svc
     namespace: agentcis-data-import-backend-consumer-test
