@@ -61,24 +61,12 @@ backendConsumer:
       - hostname: other-server
         weight: 50
 
-  httpPort: 3002
-
   livenessProbe:
-    enabled: true
-    httpGet:
-      path: /health-check
-    initialDelaySeconds: 30
-    periodSeconds: 30
-    failureThreshold: 3
+    enabled: false
 
   startupProbe:
-    enabled: true
-    httpGet:
-      path: /health-check
-    initialDelaySeconds: 10
-    periodSeconds: 10
-    failureThreshold: 5
-
+    enabled: false
+    
   readinessProbe:
     enabled: false
 
