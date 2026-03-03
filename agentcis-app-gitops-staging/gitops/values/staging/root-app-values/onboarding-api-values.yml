@@ -64,6 +64,33 @@ backend:
       - hostname: other-server
         weight: 50
 
+  # Kubernetes probes – app exposes GET /health-check (see onboarding-service src/routes/index.ts)
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health-check
+      port: 3003
+    initialDelaySeconds: 15
+    periodSeconds: 30
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health-check
+      port: 3003
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+
+  startupProbe:
+    enabled: true
+    httpGet:
+      path: /health-check
+      port: 3003
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
 
   service:
     enabled: true
@@ -87,8 +114,9 @@ backend:
     className: nginx
     host: subash.globalyhub.com
     path: /
+    
   httproute:
-    enabled: true
+    enabled: false
     gateway:
       name: "agentcisapp-stage-alb-gateway"
       namespace: "agentcisapp-gateway"
@@ -97,8 +125,9 @@ backend:
       paths:
         - /api/v1/agent-portal
     urlRewriteEnabled: false
+
   targetGroupConfiguration:
-    enabled: true
+    enabled: false
     targetType: "instance"
     healthCheckPath: "/nginx-health"
     healthCheckProtocol: "HTTP"
@@ -109,4 +138,3 @@ backend:
     unhealthyThresholdCount: 2
     matcher:
       httpCode: "200-399,401-404"
-    

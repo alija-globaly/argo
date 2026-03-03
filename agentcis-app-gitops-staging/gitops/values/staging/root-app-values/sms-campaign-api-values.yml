@@ -66,6 +66,7 @@ backend:
 
   # probe configurations
   livenessProbe:
+    enabled: true
     httpGet:
       path: /sms-campaign/webhook/health
       port: 3004
@@ -74,19 +75,21 @@ backend:
     failureThreshold: 3
   
   readinessProbe:
+    enabled: true
     httpGet:
       path: /sms-campaign/webhook/health
       port: 3004
     initialDelaySeconds: 30
     periodSeconds: 30
-  
-  # startupProbe:
-  #   httpGet:
-  #     path: /sms-campaign/webhook/health
-  #     port: 3004
-  #   initialDelaySeconds: 30
-  #   periodSeconds: 30
-  #   failureThreshold: 10  
+
+  startupProbe:
+    enabled: true
+    httpGet:
+      path: /sms-campaign/webhook/health
+      port: 3004
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 10  
 
 
   service:
@@ -96,7 +99,7 @@ backend:
     svcport: 3004
 
   hpa:
-    enabled: true
+    enabled: false
     minReplicas: 1
     maxReplicas: 3
     cpuUtilization: 50
@@ -111,8 +114,9 @@ backend:
     className: nginx
     host: subash.globalyhub.com
     path: /
+    
   httproute:
-    enabled: true
+    enabled: false
     gateway:
       name: "agentcisapp-stage-alb-gateway"
       namespace: "agentcisapp-gateway"
@@ -121,8 +125,9 @@ backend:
       paths:
         - /api/v1/agent-portal
     urlRewriteEnabled: false
+
   targetGroupConfiguration:
-    enabled: true
+    enabled: false
     targetType: "instance"
     healthCheckPath: "/nginx-health"
     healthCheckProtocol: "HTTP"

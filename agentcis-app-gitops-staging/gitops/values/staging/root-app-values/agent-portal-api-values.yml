@@ -66,6 +66,7 @@ backend:
 
   # probe configurations
   livenessProbe:
+    enabled: true
     httpGet:
       path: /agent-portal/health-check 
       port: 3007
@@ -74,6 +75,7 @@ backend:
     failureThreshold: 3
   
   readinessProbe:
+    enabled: true
     httpGet:
       path: /agent-portal/health-check 
       port: 3007
@@ -81,6 +83,7 @@ backend:
     periodSeconds: 30
   
   startupProbe:
+    enabled: true
     httpGet:
       path: /agent-portal/health-check 
       port: 3007
@@ -89,6 +92,7 @@ backend:
     failureThreshold: 3
 
   service:
+    enabled: true
     port: 3007
     portName: backend-node-port
     type: ClusterIP
@@ -104,9 +108,34 @@ backend:
       podsValue: 2
     scaleDown:
       podsValue: 1
+
   ingress:
     enabled: false
-    clusterIssuer: lets-encrypt-staging
-    tlsEnabled: false
+    clusterIssuer: lets-encrypt
+    className: nginx
     host: subash.globalyhub.com
     path: /
+
+  httproute:
+    enabled: false
+    gateway:
+      name: "agentcisapp-stage-alb-gateway"
+      namespace: "agentcisapp-gateway"
+      sectionName: "https"
+    httpMultipleRoute:
+      paths:
+        - /api/v1/agent-portal
+    urlRewriteEnabled: false
+
+  targetGroupConfiguration:
+    enabled: false
+    targetType: "instance"
+    healthCheckPath: "/nginx-health"
+    healthCheckProtocol: "HTTP"
+    healthCheckPort: "80"
+    healthCheckInterval: 5
+    healthCheckTimeout: 4      # ← ADD THIS LINE
+    healthyThresholdCount: 2
+    unhealthyThresholdCount: 2
+    matcher:
+      httpCode: "200-399,401-404"

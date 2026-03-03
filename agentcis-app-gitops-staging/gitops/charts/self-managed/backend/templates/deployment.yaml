@@ -35,20 +35,39 @@ spec:
         ports:
         - containerPort: {{ .Values.backend.service.containerport }}
 
-        {{- if .Values.backend.livenessProbe }}
+
+        {{- if .Values.backend.livenessProbe.enabled }}
         livenessProbe:
-          {{- toYaml .Values.backend.livenessProbe | nindent 10 }}
-        {{- end }}
-        
-        {{- if .Values.backend.readinessProbe }}
+          httpGet:
+            path: {{ .Values.backend.livenessProbe.httpGet.path | default "/health-check" }}
+            port: {{ .Values.backend.livenessProbe.httpGet.port | default 3002 }}
+          initialDelaySeconds: {{ .Values.backend.livenessProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.backend.livenessProbe.periodSeconds | default 20 }}
+          failureThreshold: {{ .Values.backend.livenessProbe.failureThreshold | default 3 }}
+        {{- end }}    
+
+
+        {{- if .Values.backend.readinessProbe.enabled }}
         readinessProbe:
-          {{- toYaml .Values.backend.readinessProbe | nindent 10 }}
+          httpGet:
+            path: {{ .Values.backend.readinessProbe.httpGet.path | default "/health-check" }}
+            port: {{ .Values.backend.readinessProbe.httpGet.port | default 3002 }}
+          initialDelaySeconds: {{ .Values.backend.readinessProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.backend.readinessProbe.periodSeconds | default 20 }}
+          failureThreshold: {{ .Values.backend.readinessProbe.failureThreshold | default 3 }}
+        {{- end }}    
+
+
+        {{- if .Values.backend.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            path: {{ .Values.backend.startupProbe.httpGet.path | default "/health-check" }}
+            port: {{ .Values.backend.startupProbe.httpGet.port | default 3002 }}
+          initialDelaySeconds: {{ .Values.backend.startupProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.backend.startupProbe.periodSeconds | default 20 }}
+          failureThreshold: {{ .Values.backend.startupProbe.failureThreshold | default 3 }}
         {{- end }}
         
-        {{- if .Values.backend.startupProbe }}
-        startupProbe:
-          {{- toYaml .Values.backend.startupProbe | nindent 10 }}
-        {{- end }}
 
         {{- if .Values.backend.volumes.enabled }}
         volumeMounts:

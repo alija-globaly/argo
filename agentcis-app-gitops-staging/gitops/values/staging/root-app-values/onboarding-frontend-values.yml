@@ -86,27 +86,31 @@ frontend:
     scaleDown:
       podsValue: 1
 
+
   ingress:
     enabled: false
-    clusterIssuer: lets-encrypt-production
-    tlsEnabled: false
-    host: staging.agentcis.com
+    clusterIssuer: lets-encrypt
+    className: nginx
+    host: subash.globalyhub.com
     path: /
-
+    
   httproute:
     enabled: false
-    path: "/agent-portal"
     gateway:
       name: "agentcisapp-stage-alb-gateway"
       namespace: "agentcisapp-gateway"
       sectionName: "https"
-
+    httpMultipleRoute:
+      paths:
+        - /api/v1/agent-portal
+    urlRewriteEnabled: false
 
   targetGroupConfiguration:
     enabled: false
     targetType: "instance"
     healthCheckPath: "/nginx-health"
     healthCheckProtocol: "HTTP"
+    healthCheckPort: "80"
     healthCheckInterval: 5
     healthCheckTimeout: 4      # ← ADD THIS LINE
     healthyThresholdCount: 2

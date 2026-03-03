@@ -66,14 +66,16 @@ backend:
 
   # probe configurations
   livenessProbe:
+    enabled: true
     httpGet:
       path: /health-check
       port: 3002
-    initialDelaySeconds: 30
+    initialDelaySeconds: 15
     periodSeconds: 30
     failureThreshold: 3
   
   readinessProbe:
+    enabled: true
     httpGet:
       path: /health-check
       port: 3002
@@ -81,6 +83,7 @@ backend:
     periodSeconds: 30
   
   startupProbe:
+    enabled: true
     httpGet:
       path: /health-check
       port: 3002
@@ -105,14 +108,16 @@ backend:
     scaleDown:
       podsValue: 1
 
+
   ingress:
     enabled: false
     clusterIssuer: lets-encrypt
     className: nginx
     host: subash.globalyhub.com
     path: /
+    
   httproute:
-    enabled: true
+    enabled: false
     gateway:
       name: "agentcisapp-stage-alb-gateway"
       namespace: "agentcisapp-gateway"
@@ -121,8 +126,9 @@ backend:
       paths:
         - /api/v1/agent-portal
     urlRewriteEnabled: false
+
   targetGroupConfiguration:
-    enabled: true
+    enabled: false
     targetType: "instance"
     healthCheckPath: "/nginx-health"
     healthCheckProtocol: "HTTP"

@@ -112,8 +112,9 @@ backend:
     className: nginx
     host: subash.globalyhub.com
     path: /
+    
   httproute:
-    enabled: true
+    enabled: false
     gateway:
       name: "agentcisapp-stage-alb-gateway"
       namespace: "agentcisapp-gateway"
@@ -122,8 +123,9 @@ backend:
       paths:
         - /api/v1/agent-portal
     urlRewriteEnabled: false
+
   targetGroupConfiguration:
-    enabled: true
+    enabled: false
     targetType: "instance"
     healthCheckPath: "/nginx-health"
     healthCheckProtocol: "HTTP"
@@ -134,4 +136,3 @@ backend:
     unhealthyThresholdCount: 2
     matcher:
       httpCode: "200-399,401-404"
-    
