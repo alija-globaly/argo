@@ -14,7 +14,7 @@ spec:
     path: "agentcis-app-gitops-staging/gitops/charts/self-managed/backend" # path to the Helm chart
     helm:
       valueFiles:
-        - ../../../gitops/values/staging/root-app-values/data-import-api-values.yml   # your backend values file
+        - ../../../values/staging/root-app-values/data-import-api-values.yml   # your backend values file
   destination:
     server: https://kubernetes.default.svc
     namespace: agentcis-data-import-backend-test
