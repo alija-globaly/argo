@@ -64,13 +64,13 @@ backendConsumer:
       - hostname: other-server
         weight: 50
 
-  # Probe configurations (enable only if the consumer app exposes /health-check or similar)
+  httpPort: 3002
+
   livenessProbe:
     enabled: true
     httpGet:
       path: /health-check
-      port: 3002
-    initialDelaySeconds: 15
+    initialDelaySeconds: 30
     periodSeconds: 30
     failureThreshold: 3
 
@@ -78,10 +78,12 @@ backendConsumer:
     enabled: true
     httpGet:
       path: /health-check
-      port: 3002
-    initialDelaySeconds: 30
-    periodSeconds: 30
-    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    failureThreshold: 5
+
+  readinessProbe:
+    enabled: false
 
   service:
     enabled: true

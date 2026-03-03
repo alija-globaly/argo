@@ -64,32 +64,24 @@ auth:
       - hostname: other-server
         weight: 50
 
+  grpcPort: 50052
+
   # Auth is gRPC-only (auth.service.ts binds to GRPC_HOST, default 0.0.0.0:50051; gitops uses portTwo 50052).
   # No HTTP or gRPC health service in auth.proto — use tcpSocket to check gRPC port is listening.
-  # Optional: implement grpc.health.v1.Health in auth and switch to grpc.port: 50052 for proper health.
   livenessProbe:
     enabled: true
-    tcpSocket:
-      port: 50052
-    initialDelaySeconds: 15
-    periodSeconds: 30
+    initialDelaySeconds: 20
+    periodSeconds: 20
     failureThreshold: 3
 
   readinessProbe:
     enabled: true
-    tcpSocket:
-      port: 50052
-    initialDelaySeconds: 30
-    periodSeconds: 30
+    initialDelaySeconds: 15
+    periodSeconds: 10
     failureThreshold: 3
 
   startupProbe:
-    enabled: true
-    tcpSocket:
-      port: 50052
-    initialDelaySeconds: 30
-    periodSeconds: 30
-    failureThreshold: 3
+    enabled: false
 
   service:
     enabled: true

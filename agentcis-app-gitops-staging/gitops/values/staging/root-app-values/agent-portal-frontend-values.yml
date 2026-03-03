@@ -72,32 +72,32 @@ frontend:
       - hostname: other-server
         weight: 50
 
-  # probe configurations
+
+  httpPort: 80  
+
   livenessProbe:
     enabled: true
     httpGet:
       path: /
-      port: 80
-    initialDelaySeconds: 30
+    initialDelaySeconds: 15
     periodSeconds: 30
     failureThreshold: 3
-  
+
   readinessProbe:
     enabled: true
     httpGet:
       path: /
-      port: 80
-    initialDelaySeconds: 30
+    initialDelaySeconds: 15
     periodSeconds: 30
-  
+    failureThreshold: 3
+
   startupProbe:
     enabled: true
     httpGet:
       path: /
-      port: 80
-    initialDelaySeconds: 30
+    initialDelaySeconds: 15
     periodSeconds: 30
-    failureThreshold: 10
+    failureThreshold: 3
     
   service:
     enabled: true

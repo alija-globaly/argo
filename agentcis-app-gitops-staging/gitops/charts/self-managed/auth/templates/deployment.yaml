@@ -36,7 +36,34 @@ spec:
         - containerPort: {{ .Values.auth.service.portOne }}
         - containerPort: {{ .Values.auth.service.portTwo }}
 
+        {{- if .Values.auth.livenessProbe.enabled }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.auth.grpcPort }}
+          initialDelaySeconds: {{ .Values.auth.livenessProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.auth.livenessProbe.periodSeconds | default 30 }}
+          failureThreshold: {{ .Values.auth.livenessProbe.failureThreshold | default 3 }}
+        {{- end }}
         
+        {{- if .Values.auth.readinessProbe.enabled }}
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.auth.grpcPort }}
+          initialDelaySeconds: {{ .Values.auth.readinessProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.auth.readinessProbe.periodSeconds | default 30 }}
+          failureThreshold: {{ .Values.auth.readinessProbe.failureThreshold | default 3 }}
+        {{- end }}
+
+        {{- if .Values.auth.startupProbe.enabled }}
+        startupProbe:
+          tcpSocket:
+            port: {{ .Values.auth.grpcPort }}
+          initialDelaySeconds: {{ .Values.auth.startupProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.auth.startupProbe.periodSeconds | default 30 }}
+          failureThreshold: {{ .Values.auth.startupProbe.failureThreshold | default 3 }}
+        {{- end }}
+
+
         {{- if .Values.auth.volumes.enabled }}
         volumeMounts:
         {{- if .Values.auth.volumes.env.enabled }}

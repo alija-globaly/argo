@@ -64,33 +64,31 @@ backend:
       - hostname: other-server
         weight: 50
 
-  # Kubernetes probes – app exposes GET /health-check (see onboarding-service src/routes/index.ts)
+  httpPort: 3003
+
   livenessProbe:
     enabled: true
     httpGet:
       path: /health-check
-      port: 3003
-    initialDelaySeconds: 15
-    periodSeconds: 30
+    initialDelaySeconds: 20
+    periodSeconds: 20
     failureThreshold: 3
 
   readinessProbe:
     enabled: true
     httpGet:
       path: /health-check
-      port: 3003
-    initialDelaySeconds: 30
-    periodSeconds: 30
+    initialDelaySeconds: 15
+    periodSeconds: 10
     failureThreshold: 3
 
   startupProbe:
     enabled: true
     httpGet:
       path: /health-check
-      port: 3003
-    initialDelaySeconds: 30
-    periodSeconds: 30
-    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    failureThreshold: 5
 
   service:
     enabled: true
@@ -99,7 +97,7 @@ backend:
     svcport: 3003
 
   hpa:
-    enabled: true
+    enabled: false
     minReplicas: 1
     maxReplicas: 3
     cpuUtilization: 50

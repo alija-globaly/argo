@@ -74,41 +74,37 @@ frontend:
       - hostname: other-server
         weight: 50
 
-  # probe configurations
+  httpPort: 80
+
   livenessProbe:
     enabled: true
     httpGet:
       path: /
-      port: 80
     initialDelaySeconds: 30
     periodSeconds: 30
     failureThreshold: 3
-  
+
   readinessProbe:
     enabled: true
     httpGet:
       path: /
-      port: 80
     initialDelaySeconds: 30
     periodSeconds: 30
-  
+    failureThreshold: 3
+
   startupProbe:
     enabled: true
     httpGet:
       path: /
-      port: 80
     initialDelaySeconds: 30
     periodSeconds: 30
     failureThreshold: 10
-    
-    
+
   service:
     enabled: true
-    port: 80
-    portName: nginx-http
-    # type: ClusterIP
-    targetPort: 80
-    type: NodePort    
+    type: NodePort
+    containerport: 80
+    svcport: 80    
 
   hpa:
     enabled: false

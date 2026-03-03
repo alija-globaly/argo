@@ -35,6 +35,36 @@ spec:
         ports:
         - containerPort: {{ .Values.backendConsumer.service.containerport }}
 
+        {{- if .Values.backendConsumer.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.backendConsumer.livenessProbe.httpGet.path }}
+            port: {{ .Values.backendConsumer.httpPort }}
+          initialDelaySeconds: {{ .Values.backendConsumer.livenessProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.backendConsumer.livenessProbe.periodSeconds | default 30 }}
+          failureThreshold: {{ .Values.backendConsumer.livenessProbe.failureThreshold | default 3 }}
+        {{- end }}
+
+        {{- if .Values.backendConsumer.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.backendConsumer.readinessProbe.httpGet.path }}
+            port: {{ .Values.backendConsumer.httpPort }}
+          initialDelaySeconds: {{ .Values.backendConsumer.readinessProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.backendConsumer.readinessProbe.periodSeconds | default 30 }}
+          failureThreshold: {{ .Values.backendConsumer.readinessProbe.failureThreshold | default 3 }}
+        {{- end }}
+
+        {{- if .Values.backendConsumer.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            path: {{ .Values.backendConsumer.startupProbe.httpGet.path }}
+            port: {{ .Values.backendConsumer.httpPort }}
+          initialDelaySeconds: {{ .Values.backendConsumer.startupProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.backendConsumer.startupProbe.periodSeconds | default 30 }}
+          failureThreshold: {{ .Values.backendConsumer.startupProbe.failureThreshold | default 3 }}
+        {{- end }}
+
         {{- if .Values.backendConsumer.volumes.enabled }}
         volumeMounts:
         {{- if .Values.backendConsumer.volumes.env.enabled }}

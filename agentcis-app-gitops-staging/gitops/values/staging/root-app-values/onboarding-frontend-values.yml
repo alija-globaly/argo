@@ -70,6 +70,32 @@ frontend:
       - hostname: other-server
         weight: 50
 
+  httpPort: 80
+  
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+
+  startupProbe:
+    enabled: true
+    httpGet:
+      path: /
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 10
+
   service:
     enabled: true
     type: ClusterIP
