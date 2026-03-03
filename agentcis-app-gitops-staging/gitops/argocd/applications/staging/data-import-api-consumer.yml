@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: agentcis-data-import-backend-test
+  name: agentcis-data-import-backend-consumer-test
   namespace: argocd
   # finalizers:
   #   - resources-finalizer.argocd.argoproj.io/background  
@@ -14,10 +14,10 @@ spec:
     path: "agentcis-app-gitops-staging/gitops/charts/self-managed/backend" # path to the Helm chart
     helm:
       valueFiles:
-        - ../../../values/staging/root-app-values/data-import-api-values.yml   # your backend values file
+        - ../../../gitops/values/staging/root-app-values/data-import-api-consumer-values.yml   # your backend consumer values file
   destination:
     server: https://kubernetes.default.svc
-    namespace: agentcis-data-import-backend-test
+    namespace: agentcis-data-import-backend-consumer-test
   syncPolicy:
     automated:
       prune: true
