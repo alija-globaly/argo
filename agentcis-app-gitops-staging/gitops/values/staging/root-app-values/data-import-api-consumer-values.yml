@@ -8,7 +8,7 @@ backendConsumer:
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
-    enabled: false
+    enabled: true
     name: ecr-registry-secret
 
   startupCommand:
@@ -16,12 +16,9 @@ backendConsumer:
     shell: /bin/sh
     command: |
       echo "-------------------------------"
-      echo "k8s => restarting nginx"
-      service nginx restart
-      echo "-------------------------------"
       echo "k8s => starting data-import consumer"
       echo "-------------------------------"
-      pnpm start:import-consumer | tee -a /prod/packages/import-backend/logs/data-import-consumer.log 
+      pnpm start:import-consumer | tee -a /prod/packages/import-backend/logs/data-import-consumer.log
 
   resources:
     requests:
