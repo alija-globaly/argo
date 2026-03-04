@@ -16,11 +16,11 @@ lavinmq:
 
 
 # -----------------------------------------------
-# Storage config (used by my-lavinmq.yaml)
+# Storage config (used by lavinmq.yaml)
 # -----------------------------------------------
 pv:
   size: 5Gi
-  storageClass: nfs-client-lavinmq         # ← must match storageClass.name above
+  storageClass: nfs-client-lavinmq         # ← must match storageClass.name from nfs-provisioner for lavinmq
 
 
 # -----------------------------------------------
