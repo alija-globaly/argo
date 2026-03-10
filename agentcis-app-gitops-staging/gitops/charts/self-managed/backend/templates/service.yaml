@@ -18,11 +18,28 @@ spec:
     app: {{ .Values.backend.name }}
   type: {{ .Values.backend.service.type }}
   ports:
+  {{- if .Values.backend.service.portTwo }}
+    - name: {{ .Values.backend.service.portNameOne }}
+      port: {{ .Values.backend.service.portOne }}
+      targetPort: {{ .Values.backend.service.targetPortOne }}
+      {{- if .Values.backend.service.nodePortOne }}
+      nodePort: {{ .Values.backend.service.nodePortOne }}
+      {{- end }}
+      protocol: TCP
+    - name: {{ .Values.backend.service.portNameTwo }}
+      port: {{ .Values.backend.service.portTwo }}
+      targetPort: {{ .Values.backend.service.targetPortTwo }}
+      {{- if .Values.backend.service.nodePortTwo }}
+      nodePort: {{ .Values.backend.service.nodePortTwo }}
+      {{- end }}
+      protocol: TCP
+  {{- else }}
     - name: {{ .Values.backend.name }}-port
       port: {{ .Values.backend.service.svcport }}
       targetPort: {{ .Values.backend.service.containerport }}
       protocol: TCP
+  {{- end }}
   ipFamilyPolicy: SingleStack
-  ipFamilies: 
+  ipFamilies:
     - IPv4
 {{- end }}

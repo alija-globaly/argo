@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: "https://github.com/alija-globaly/argo.git"
     targetRevision: "main"
-    path: "agentcis-app-gitops-staging/gitops/charts/self-managed/auth"
+    path: "agentcis-app-gitops-staging/gitops/charts/self-managed/backend"
     helm:
       valueFiles:
         - ../../../values/staging/root-app-values/auth-values.yml 

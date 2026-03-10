@@ -33,9 +33,22 @@ spec:
 {{ .Values.backend.startupCommand.command | indent 12 }}
         {{- end }}
         ports:
+        {{- if .Values.backend.service.portTwo }}
+        - containerPort: {{ .Values.backend.service.portOne }}
+        - containerPort: {{ .Values.backend.service.portTwo }}
+        {{- else }}
         - containerPort: {{ .Values.backend.service.containerport }}
+        {{- end }}
 
         {{- if .Values.backend.livenessProbe.enabled }}
+        {{- if .Values.backend.grpcPort }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.backend.grpcPort }}
+          initialDelaySeconds: {{ .Values.backend.livenessProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.backend.livenessProbe.periodSeconds | default 20 }}
+          failureThreshold: {{ .Values.backend.livenessProbe.failureThreshold | default 3 }}
+        {{- else }}
         livenessProbe:
           httpGet:
             path: {{ .Values.backend.livenessProbe.httpGet.path }}
@@ -43,9 +56,18 @@ spec:
           initialDelaySeconds: {{ .Values.backend.livenessProbe.initialDelaySeconds | default 15 }}
           periodSeconds: {{ .Values.backend.livenessProbe.periodSeconds | default 20 }}
           failureThreshold: {{ .Values.backend.livenessProbe.failureThreshold | default 3 }}
-        {{- end }}    
+        {{- end }}
+        {{- end }}
 
         {{- if .Values.backend.readinessProbe.enabled }}
+        {{- if .Values.backend.grpcPort }}
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.backend.grpcPort }}
+          initialDelaySeconds: {{ .Values.backend.readinessProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.backend.readinessProbe.periodSeconds | default 20 }}
+          failureThreshold: {{ .Values.backend.readinessProbe.failureThreshold | default 3 }}
+        {{- else }}
         readinessProbe:
           httpGet:
             path: {{ .Values.backend.readinessProbe.httpGet.path }}
@@ -53,9 +75,18 @@ spec:
           initialDelaySeconds: {{ .Values.backend.readinessProbe.initialDelaySeconds | default 15 }}
           periodSeconds: {{ .Values.backend.readinessProbe.periodSeconds | default 20 }}
           failureThreshold: {{ .Values.backend.readinessProbe.failureThreshold | default 3 }}
-        {{- end }}    
+        {{- end }}
+        {{- end }}
 
         {{- if .Values.backend.startupProbe.enabled }}
+        {{- if .Values.backend.grpcPort }}
+        startupProbe:
+          tcpSocket:
+            port: {{ .Values.backend.grpcPort }}
+          initialDelaySeconds: {{ .Values.backend.startupProbe.initialDelaySeconds | default 15 }}
+          periodSeconds: {{ .Values.backend.startupProbe.periodSeconds | default 20 }}
+          failureThreshold: {{ .Values.backend.startupProbe.failureThreshold | default 3 }}
+        {{- else }}
         startupProbe:
           httpGet:
             path: {{ .Values.backend.startupProbe.httpGet.path }}
@@ -63,6 +94,7 @@ spec:
           initialDelaySeconds: {{ .Values.backend.startupProbe.initialDelaySeconds | default 15 }}
           periodSeconds: {{ .Values.backend.startupProbe.periodSeconds | default 20 }}
           failureThreshold: {{ .Values.backend.startupProbe.failureThreshold | default 3 }}
+        {{- end }}
         {{- end }}
         
         {{- if .Values.backend.volumes.enabled }}
