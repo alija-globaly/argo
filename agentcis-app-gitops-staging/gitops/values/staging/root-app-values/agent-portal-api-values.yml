@@ -4,7 +4,7 @@ backend:
 
   image:
     repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/agent-portal-api
-    tag: agent-portal-api-02-04-d8ea2f3
+    tag: agent-portal-api-03-10-7aa9ed6
     pullPolicy: IfNotPresent
 
   imagePullSecrets:

@@ -3,8 +3,8 @@ frontend:
   replicaCount: 1
 
   image:
-    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/sub-agent-control-frontend
-    tag: sub-agent-control-frontend-01-16-6f6659f
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/agent-portal-frontend
+    tag: agent-portal-frontend-03-11-84bc842
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
