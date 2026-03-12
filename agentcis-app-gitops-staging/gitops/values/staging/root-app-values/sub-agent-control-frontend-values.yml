@@ -1,0 +1,149 @@
+frontend:
+  name: agentcis-sub-agent-control-frontend
+  replicaCount: 1
+
+  image:
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/sub-agent-control-frontend
+    tag: sub-agent-control-frontend-03-11-15ba859
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets:
+    enabled: true
+    name: ecr-registry-secret
+
+  startupCommand:
+    enabled: false
+    shell: /bin/sh
+    command: |
+      echo "-------------------------------"
+      echo "k8s => restarting nginx"
+      echo "-------------------------------"
+      service nginx start
+      echo "k8s => restarting nginx"
+      echo "-------------------------------"
+      echo "k8s => starting NODE frontend"
+      echo "-------------------------------"
+      node .output/server/index.mjs
+
+  resources:
+    requests:
+      memory: "500Mi"
+    limits:
+      memory: "1000Mi"
+
+
+
+  pv:
+    config:
+      name: nfs-pv-agent-portal-config-test
+      capacity: 5Gi
+      nfsPath: /agentcis-manifest/agent-portal/config
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
+    log:
+      name: nfs-pv-agent-portal-test
+      capacity: 5Gi
+      nfsPath: /agentcis-pvc/helm-test
+      nfsServer: nfs.agentcisinteral.com
+      reclaimPolicy: Retain
+
+
+  volumes:
+    enabled: true
+    env:
+      enabled: true
+      pvcName: nfs-agent-portal-config-pvc-test
+      nginxOneMountPath: /etc/nginx/nginx.conf
+      nginxOneSubPath: nginx.conf
+
+      nginxTwoMountPath: /etc/nginx/conf.d/frontend-nginx.conf
+      nginxTwoSubPath: frontend-nginx.conf
+
+
+    logs:
+      enabled: true
+      pvcName: nfs-agent-portal-pvc-test 
+      mountPath: /var/log/nginx
+      subPath: import-frontend-log
+
+  affinity:
+    enabled: false
+    preferredNodes:
+      - hostname: agentcis-staging-k8s-master-172-34-28-189
+        weight: 100
+      - hostname: other-server
+        weight: 50
+
+  httpPort: 80
+
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+
+  startupProbe:
+    enabled: true
+    httpGet:
+      path: /
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 10
+
+  service:
+    enabled: true
+    type: NodePort
+    containerport: 80
+    svcport: 80    
+
+  hpa:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    cpuUtilization: 50
+    scaleUp:
+      podsValue: 2
+    scaleDown:
+      podsValue: 1
+
+
+  ingress:
+    enabled: false
+    clusterIssuer: lets-encrypt
+    className: nginx
+    host: subash.globalyhub.com
+    path: /
+    
+  httproute:
+    enabled: false
+    gateway:
+      name: "agentcisapp-stage-alb-gateway"
+      namespace: "agentcisapp-gateway"
+      sectionName: "https"
+    httpMultipleRoute:
+      paths:
+        - /api/v1/agent-portal
+    urlRewriteEnabled: false
+
+  targetGroupConfiguration:
+    enabled: false
+    targetType: "instance"
+    healthCheckPath: "/nginx-health"
+    healthCheckProtocol: "HTTP"
+    healthCheckPort: "80"
+    healthCheckInterval: 5
+    healthCheckTimeout: 4      # ← ADD THIS LINE
+    healthyThresholdCount: 2
+    unhealthyThresholdCount: 2
+    matcher:
+      httpCode: "200-399,401-404"
