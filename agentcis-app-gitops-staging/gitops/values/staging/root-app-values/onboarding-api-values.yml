@@ -3,8 +3,8 @@ backend:
   replicaCount: 1
 
   image:
-    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/onboarding-frontend
-    tag: "onboarding-backend-02-02-be4a310"
+    repository: 834033184010.dkr.ecr.ap-southeast-2.amazonaws.com/onboarding-service
+    tag: onboarding-service-02-16-d4a32a4
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
