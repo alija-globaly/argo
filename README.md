@@ -18,3 +18,11 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 kubectl -n argocd get secret argocd-initial-admin-secret \
   -o jsonpath="{.data.password}" | base64 -d
 sEIDB4LKd7Nm-owH
+
+
+
+
+mumbai region
+ubuntu@root-master-nginx-ingress-172-34-0-67:~$ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+gwMRVh-6-L7831lp
+
